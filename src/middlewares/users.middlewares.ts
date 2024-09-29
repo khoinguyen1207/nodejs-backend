@@ -1,12 +1,12 @@
-import { Request, Response, NextFunction } from 'express'
-import { checkSchema } from 'express-validator'
-import userService from '~/services/users.services'
-import { validate } from '~/utils/validation'
+import { Request, Response, NextFunction } from "express"
+import { checkSchema } from "express-validator"
+import userService from "~/services/users.services"
+import { validate } from "~/utils/validation"
 
 export const loginValidator = (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body
   if (!email || !password) {
-    return res.status(400).json({ message: 'Email and password are required' })
+    return res.status(400).json({ message: "Email and password are required" })
   }
   next()
 }
@@ -15,12 +15,12 @@ export const registerValidator = validate(
   checkSchema({
     name: {
       notEmpty: {
-        errorMessage: 'Name is required',
+        errorMessage: "Name is required",
       },
       isString: true,
       trim: true,
       isLength: {
-        errorMessage: 'Name must be between 1 and 255 characters',
+        errorMessage: "Name must be between 1 and 255 characters",
         options: {
           min: 1,
           max: 255,
@@ -29,15 +29,15 @@ export const registerValidator = validate(
     },
     email: {
       notEmpty: {
-        errorMessage: 'Email is required',
+        errorMessage: "Email is required",
       },
       isString: true,
       trim: true,
       isEmail: {
-        errorMessage: 'Email is invalid',
+        errorMessage: "Email is invalid",
       },
       isLength: {
-        errorMessage: 'Email must be between 6 and 255 characters',
+        errorMessage: "Email must be between 6 and 255 characters",
         options: {
           min: 6,
           max: 255,
@@ -47,7 +47,7 @@ export const registerValidator = validate(
         options: async (value) => {
           const isEmailExist = await userService.checkEmailExist(value)
           if (isEmailExist) {
-            throw new Error('Email already exists')
+            throw new Error("Email already exists")
           }
           return true
         },
@@ -55,12 +55,12 @@ export const registerValidator = validate(
     },
     password: {
       notEmpty: {
-        errorMessage: 'Password is required',
+        errorMessage: "Password is required",
       },
       isString: true,
       trim: true,
       isStrongPassword: {
-        errorMessage: 'Password must be at least 6 characters, 1 lowercase, 1 uppercase, 1 number, 1 symbol',
+        errorMessage: "Password must be at least 6 characters, 1 lowercase, 1 uppercase, 1 number, 1 symbol",
         options: {
           minLength: 6,
           minLowercase: 1,
@@ -74,13 +74,13 @@ export const registerValidator = validate(
     confirm_password: {
       isString: true,
       notEmpty: {
-        errorMessage: 'Confirm password is required',
+        errorMessage: "Confirm password is required",
       },
       trim: true,
       custom: {
         options: (value, { req }) => {
           if (value !== req.body.password) {
-            throw new Error('Password confirmation does not match password')
+            throw new Error("Password confirmation does not match password")
           }
           return true
         },
@@ -88,7 +88,7 @@ export const registerValidator = validate(
     },
     date_of_birth: {
       isISO8601: {
-        errorMessage: 'Date of birth is invalid',
+        errorMessage: "Date of birth is invalid",
         options: {
           strict: true,
           strictSeparator: true,

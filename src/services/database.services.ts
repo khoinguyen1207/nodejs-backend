@@ -1,6 +1,6 @@
-import { MongoClient, Db, Collection } from 'mongodb'
-import { User } from '~/models/schemas/User.schema'
-import { envConfig } from '~/constants/config'
+import { MongoClient, Db, Collection } from "mongodb"
+import { User } from "~/models/schemas/User.schema"
+import { envConfig } from "~/constants/config"
 
 const uri = `mongodb+srv://${envConfig.DB_USERNAME}:${envConfig.DB_PASSWORD}@twitter.rguyisz.mongodb.net/?retryWrites=true&w=majority&appName=Twitter`
 
@@ -17,14 +17,14 @@ class DatabaseService {
       await this.client.connect()
       // Send a ping to confirm a successful connection
       await this.db.command({ ping: 1 })
-      console.log('Pinged your deployment. You successfully connected to MongoDB!')
+      console.log("Pinged your deployment. You successfully connected to MongoDB!")
     } catch (error) {
       console.log(error)
       await this.client.close()
     }
   }
   get users(): Collection<User> {
-    return this.db.collection('users')
+    return this.db.collection("users")
   }
 }
 

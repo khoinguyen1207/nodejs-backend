@@ -1,4 +1,4 @@
-import dotenv from 'dotenv'
+import dotenv from "dotenv"
 dotenv.config()
 
 export const envConfig = {
@@ -7,4 +7,7 @@ export const envConfig = {
   DB_NAME: process.env.DB_NAME,
 
   PASSWORD_SECRET_KEY: process.env.PASSWORD_SECRET_KEY,
+  JWT_SECRET_KEY: process.env.JWT_SECRET_KEY || "",
+  ACCESS_TOKEN_EXPIRES_IN: process.env.ACCESS_TOKEN_EXPIRES_IN,
+  REFRESH_TOKEN_EXPIRES_IN: process.env.REFRESH_TOKEN_EXPIRES_IN,
 }

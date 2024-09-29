@@ -1,6 +1,6 @@
-import { NextFunction, Request, Response } from 'express'
-import { validationResult, ValidationChain } from 'express-validator'
-import { RunnableValidationChains } from 'express-validator/lib/middlewares/schema'
+import { NextFunction, Request, Response } from "express"
+import { validationResult, ValidationChain } from "express-validator"
+import { RunnableValidationChains } from "express-validator/lib/middlewares/schema"
 
 // can be reused by many routes
 export const validate = (validation: RunnableValidationChains<ValidationChain>) => {
