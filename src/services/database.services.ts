@@ -1,16 +1,15 @@
 import { MongoClient, Db, Collection } from 'mongodb'
 import { User } from '~/models/schemas/User.schema'
-import dotenv from 'dotenv'
-dotenv.config()
+import { envConfig } from '~/constants/config'
 
-const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@twitter.rguyisz.mongodb.net/?retryWrites=true&w=majority&appName=Twitter`
+const uri = `mongodb+srv://${envConfig.DB_USERNAME}:${envConfig.DB_PASSWORD}@twitter.rguyisz.mongodb.net/?retryWrites=true&w=majority&appName=Twitter`
 
 class DatabaseService {
   private client: MongoClient
   private db: Db
   constructor() {
     this.client = new MongoClient(uri)
-    this.db = this.client.db(process.env.DB_NAME)
+    this.db = this.client.db(envConfig.DB_NAME)
   }
   async connect() {
     try {

@@ -1,10 +1,17 @@
+import { RegisterReqBody } from '~/models/requests/User.request'
 import { User } from '~/models/schemas/User.schema'
 import databaseService from '~/services/database.services'
+import { hashPassword } from '~/utils/crypto'
 
 class UserService {
-  async createUser(payload: { email: string; password: string }) {
-    const { email, password } = payload
-    const result = await databaseService.users.insertOne(new User({ email, password }))
+  async createUser(payload: RegisterReqBody) {
+    const result = await databaseService.users.insertOne(
+      new User({
+        ...payload,
+        date_of_birth: new Date(payload.date_of_birth),
+        password: hashPassword(payload.password),
+      }),
+    )
     return result
   }
 
