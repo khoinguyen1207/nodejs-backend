@@ -4,7 +4,7 @@ import { loginController, registerController } from "~/controllers/users.control
 import { loginValidator, registerValidator } from "~/middlewares/users.middlewares"
 import { wrapRequestHandler } from "~/utils/error-handler"
 
-usersRouter.post("/login", loginValidator, loginController)
+usersRouter.post("/login", loginValidator, wrapRequestHandler(loginController))
 usersRouter.post("/register", registerValidator, wrapRequestHandler(registerController))
 
 export default usersRouter
