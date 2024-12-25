@@ -1,4 +1,3 @@
-import { Request, Response, NextFunction } from "express"
 import { checkSchema } from "express-validator"
 import userService from "~/services/users.services"
 import { validate } from "~/utils/validation"
@@ -16,15 +15,6 @@ export const loginValidator = validate(
         options: {
           min: 6,
           max: 255,
-        },
-      },
-      custom: {
-        options: async (value) => {
-          const isEmailExist = await userService.checkEmailExist(value)
-          if (!isEmailExist) {
-            throw new Error("Email or password is incorrect")
-          }
-          return true
         },
       },
     },

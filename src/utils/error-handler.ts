@@ -1,5 +1,4 @@
 import { NextFunction, Request, RequestHandler, Response } from "express"
-import { httpStatus } from "~/constants/httpStatus"
 
 export function wrapRequestHandler(func: RequestHandler) {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -14,16 +13,19 @@ export function wrapRequestHandler(func: RequestHandler) {
 export class ErrorWithStatus {
   message: string
   status: number
-  constructor(message: string, status: number) {
+  errors: any
+  constructor(message: string, status: number, errors: any) {
     this.message = message
     this.status = status
+    this.errors = errors
   }
 }
 
-export class EntityError extends ErrorWithStatus {
+export class DefaultError {
+  message: string
   errors: any
-  constructor({ message = "Validation Error", errors }: { message?: string; errors: any }) {
-    super(message, httpStatus.UNPROCESSABLE_ENTITY)
+  constructor({ message, errors }: { message: string; errors: any }) {
+    this.message = message
     this.errors = errors
   }
 }

@@ -3,15 +3,20 @@ import { omit } from "lodash"
 import { httpStatus } from "~/constants/httpStatus"
 import { ErrorWithStatus } from "~/utils/error-handler"
 
-export const defaultErrorHandler = (error: any, req: Request, res: Response, next: NextFunction) => {
-  if (error instanceof ErrorWithStatus) {
-    return res.status(error.status).json({
-      message: error.message,
-      error: omit(error, ["status", "message"]),
+export const defaultErrorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
+  if (err instanceof ErrorWithStatus) {
+    return res.status(err.status).json({
+      message: err.message,
+      errors: {
+        ...err.errors,
+      },
     })
   }
+  Object.getOwnPropertyNames(err).forEach((key) => {
+    Object.defineProperty(err, key, { enumerable: true })
+  })
   res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
     message: "Internal server error",
-    error: error,
+    errors: omit(err, ["stack"]),
   })
 }
