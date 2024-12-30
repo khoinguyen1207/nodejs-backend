@@ -1,10 +1,16 @@
-import jwt, { SignOptions } from "jsonwebtoken"
+import jwt, { JwtPayload, SignOptions } from "jsonwebtoken"
 import { envConfig } from "~/constants/config"
+import { DefaultError, UnauthorizedError } from "~/utils/error-handler"
 
 interface SignTokenPayload {
   payload: string | Buffer | object
   privateKey?: string
   options?: SignOptions
+}
+
+interface VerifyTokenPayload {
+  token: string
+  secretOrPublicKey?: string
 }
 
 export const signToken = ({
@@ -20,6 +26,17 @@ export const signToken = ({
         throw reject(error)
       }
       resolve(token as string)
+    })
+  })
+}
+
+export const verifyToken = ({ token, secretOrPublicKey = envConfig.JWT_SECRET_KEY }: VerifyTokenPayload) => {
+  return new Promise<JwtPayload>((resolve, reject) => {
+    jwt.verify(token, secretOrPublicKey, (error, decoded) => {
+      if (error) {
+        throw reject(new UnauthorizedError(error.message, error))
+      }
+      resolve(decoded as JwtPayload)
     })
   })
 }

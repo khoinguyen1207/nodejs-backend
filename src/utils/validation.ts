@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from "express"
 import { validationResult, ValidationChain } from "express-validator"
 import { RunnableValidationChains } from "express-validator/lib/middlewares/schema"
+import { omit } from "lodash"
 import { httpStatus } from "~/constants/httpStatus"
-import { DefaultError, ErrorWithStatus } from "~/utils/error-handler"
+import { DefaultError, UnprocessableEntityError } from "~/utils/error-handler"
 
 // can be reused by many routes
 export const validate = (validation: RunnableValidationChains<ValidationChain>) => {
@@ -14,14 +15,14 @@ export const validate = (validation: RunnableValidationChains<ValidationChain>) 
       return next()
     }
 
-    const entityError = new DefaultError({ message: "Validation error", errors: {} })
+    const entityError = new UnprocessableEntityError("Validation error")
     for (const key in errorObject) {
       const { msg } = errorObject[key]
-      if (msg instanceof ErrorWithStatus && msg.status !== httpStatus.UNPROCESSABLE_ENTITY) {
+      if (msg instanceof DefaultError && msg.status !== httpStatus.UNPROCESSABLE_ENTITY) {
         return next(msg)
       }
-      entityError.errors[key] = msg
+      entityError.error[key] = msg
     }
-    res.status(httpStatus.UNPROCESSABLE_ENTITY).json(entityError)
+    res.status(entityError.status).json(omit(entityError, ["status"]))
   }
 }

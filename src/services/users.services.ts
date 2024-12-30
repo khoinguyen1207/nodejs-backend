@@ -6,7 +6,7 @@ import RefreshToken from "~/models/schemas/RefreshToken.schema"
 import User from "~/models/schemas/User.schema"
 import databaseService from "~/services/database.services"
 import { hashPassword } from "~/utils/crypto"
-import { ErrorWithStatus } from "~/utils/error-handler"
+import { UnprocessableEntityError } from "~/utils/error-handler"
 import { signToken } from "~/utils/jwt"
 
 class UserService {
@@ -57,7 +57,7 @@ class UserService {
   async login(email: string, password: string) {
     const user = await databaseService.users.findOne({ email: email, password: hashPassword(password) })
     if (!user) {
-      throw new ErrorWithStatus("Login failed!", 422, { email: "Email or password is incorrect" })
+      throw new UnprocessableEntityError("Email or password is incorrect", { email: "Email or password is incorrect" })
     }
     const user_id = user._id.toString()
     const [access_token, refresh_token] = await Promise.all([this.signAccessToken(user_id), this.signRefreshToken(user_id)])
