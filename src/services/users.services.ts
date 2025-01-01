@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb"
 import { envConfig } from "~/constants/config"
 import { TokenType } from "~/constants/enums"
-import { RegisterReqBody } from "~/models/requests/User.request"
+import { LoginReqBody, RegisterReqBody } from "~/models/requests/User.request"
 import RefreshToken from "~/models/schemas/RefreshToken.schema"
 import User from "~/models/schemas/User.schema"
 import databaseService from "~/services/database.services"
@@ -39,6 +39,11 @@ class UserService {
     return Boolean(result)
   }
 
+  async checkRefreshTokenExist(refresh_token: string) {
+    const result = await databaseService.refresh_tokens.findOne({ token: refresh_token })
+    return Boolean(result)
+  }
+
   async register(payload: RegisterReqBody) {
     const result = await databaseService.users.insertOne(
       new User({
@@ -54,8 +59,8 @@ class UserService {
     return { access_token, refresh_token }
   }
 
-  async login(email: string, password: string) {
-    const user = await databaseService.users.findOne({ email: email, password: hashPassword(password) })
+  async login(payload: LoginReqBody) {
+    const user = await databaseService.users.findOne({ email: payload.email, password: hashPassword(payload.password) })
     if (!user) {
       throw new UnprocessableEntityError("Email or password is incorrect", { email: "Email or password is incorrect" })
     }
@@ -64,6 +69,11 @@ class UserService {
     const newRefreshToken = new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token })
     await databaseService.refresh_tokens.insertOne(newRefreshToken)
     return { access_token, refresh_token }
+  }
+
+  async logout(refresh_token: string) {
+    const result = await databaseService.refresh_tokens.deleteOne({ token: refresh_token })
+    return result
   }
 }
 

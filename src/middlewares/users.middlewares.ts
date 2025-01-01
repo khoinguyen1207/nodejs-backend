@@ -116,6 +116,9 @@ export const registerValidator = validate(
         },
       },
       date_of_birth: {
+        notEmpty: {
+          errorMessage: "Date of birth is required",
+        },
         isISO8601: {
           errorMessage: "Date of birth is invalid",
           options: {

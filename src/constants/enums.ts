@@ -10,3 +10,10 @@ export enum TokenType {
   ForgotPasswordToken,
   EmailVerifyToken,
 }
+
+export enum ErrorCodes {
+  NOT_FOUND = "NOT_FOUND",
+  BAD_REQUEST = "BAD_REQUEST",
+  UNAUTHORIZED = "UNAUTHORIZED",
+  UNPROCESSABLE_ENTITY = "UNPROCESSABLE_ENTITY",
+}
