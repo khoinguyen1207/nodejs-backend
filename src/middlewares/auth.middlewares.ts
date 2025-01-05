@@ -5,6 +5,7 @@ import { verifyToken } from "~/utils/jwt"
 import { validate } from "~/utils/validation"
 import { capitalize } from "lodash"
 import userService from "~/services/users.services"
+import { envConfig } from "~/constants/config"
 
 export const accessTokenValidator = validate(
   checkSchema(
@@ -21,7 +22,7 @@ export const accessTokenValidator = validate(
               if (!accessToken || prefix !== "Bearer") {
                 throw new UnauthorizedError("Invalid token", { token: "Invalid token" })
               }
-              const decoded_authorization = await verifyToken({ token: accessToken })
+              const decoded_authorization = await verifyToken({ token: accessToken, secretOrPublicKey: envConfig.JWT_SECRET_ACCESS_TOKEN })
               req.decoded_authorization = decoded_authorization
               return true
             } catch (error) {
@@ -48,12 +49,39 @@ export const refreshTokenValidator = validate(
               if (!value) {
                 throw new UnauthorizedError("Refresh token is required", { token: "Refresh token is required" })
               }
+              const decoded_refresh_token = await verifyToken({ token: value, secretOrPublicKey: envConfig.JWT_SECRET_REFRESH_TOKEN })
               const refresh_token = await userService.checkRefreshTokenExist(value)
               if (!refresh_token) {
-                throw new UnauthorizedError("Refresh token does not exist", { token: "Refresh token does not exist" })
+                throw new UnauthorizedError("Invalid token", { token: "Invalid token" })
               }
-              const decoded_refresh_token = await verifyToken({ token: value })
               req.decoded_refresh_token = decoded_refresh_token
+              return true
+            } catch (error) {
+              if (error instanceof JsonWebTokenError) {
+                throw new UnauthorizedError(capitalize(error.message), error)
+              }
+              throw error
+            }
+          },
+        },
+      },
+    },
+    ["body"],
+  ),
+)
+
+export const emailVerificationValidator = validate(
+  checkSchema(
+    {
+      email_verify_token: {
+        custom: {
+          options: async (value, { req }) => {
+            try {
+              if (!value) {
+                throw new UnauthorizedError("Email verify token is required", { token: "Email verify  token is required" })
+              }
+              const decoded_email_verify_token = await verifyToken({ token: value, secretOrPublicKey: envConfig.JWT_SECRET_EMAIL_VERIFICATION })
+              req.decoded_email_verify_token = decoded_email_verify_token
               return true
             } catch (error) {
               if (error instanceof JsonWebTokenError) {

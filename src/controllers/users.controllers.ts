@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 import userService from "~/services/users.services"
+import { TokenPayload } from "~/types/jwt"
 
 export const loginController = async (req: Request, res: Response) => {
   const { email, password } = req.body
@@ -24,5 +25,14 @@ export const logoutController = async (req: Request, res: Response, next: NextFu
   res.json({
     message: "Logout successful!",
     data: result,
+  })
+}
+
+export const emailVerificationController = async (req: Request, res: Response, next: NextFunction) => {
+  const { user_id } = req.decoded_email_verify_token as TokenPayload
+  const result = await userService.verifyEmail(user_id)
+  res.json({
+    message: result,
+    data: true,
   })
 }

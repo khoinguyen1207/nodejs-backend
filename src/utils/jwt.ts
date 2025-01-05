@@ -4,7 +4,7 @@ import { SignTokenPayload, VerifyTokenPayload } from "~/types/jwt"
 
 export const signToken = ({
   payload,
-  secretOrPublicKey = envConfig.JWT_SECRET_KEY,
+  secretOrPublicKey,
   options = {
     algorithm: "HS256",
   },
@@ -19,7 +19,7 @@ export const signToken = ({
   })
 }
 
-export const verifyToken = ({ token, secretOrPublicKey = envConfig.JWT_SECRET_KEY }: VerifyTokenPayload) => {
+export const verifyToken = ({ token, secretOrPublicKey }: VerifyTokenPayload) => {
   return new Promise<JwtPayload>((resolve, reject) => {
     jwt.verify(token, secretOrPublicKey, (error, decoded) => {
       if (error) {

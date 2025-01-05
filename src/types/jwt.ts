@@ -3,13 +3,13 @@ import { TokenType } from "~/constants/enums"
 
 export interface SignTokenPayload {
   payload: string | Buffer | object
-  secretOrPublicKey?: string
+  secretOrPublicKey: string
   options?: SignOptions
 }
 
 export interface VerifyTokenPayload {
   token: string
-  secretOrPublicKey?: string
+  secretOrPublicKey: string
 }
 
 export interface TokenPayload extends JwtPayload {
