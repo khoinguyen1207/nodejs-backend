@@ -28,9 +28,18 @@ export const logoutController = async (req: Request, res: Response, next: NextFu
   })
 }
 
-export const emailVerificationController = async (req: Request, res: Response, next: NextFunction) => {
+export const verifyEmailController = async (req: Request, res: Response, next: NextFunction) => {
   const { user_id } = req.decoded_email_verify_token as TokenPayload
   const result = await userService.verifyEmail(user_id)
+  res.json({
+    message: result,
+    data: true,
+  })
+}
+
+export const sendVerifyEmailController = async (req: Request, res: Response, next: NextFunction) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const result = await userService.sendVerifyEmail(user_id)
   res.json({
     message: result,
     data: true,

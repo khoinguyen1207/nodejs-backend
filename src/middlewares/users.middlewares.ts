@@ -1,5 +1,10 @@
 import { checkSchema } from "express-validator"
+import { JsonWebTokenError } from "jsonwebtoken"
+import { capitalize } from "lodash"
+import { envConfig } from "~/constants/config"
 import userService from "~/services/users.services"
+import { UnauthorizedError } from "~/utils/error-handler"
+import { verifyToken } from "~/utils/jwt"
 import { validate } from "~/utils/validation"
 
 export const loginValidator = validate(
@@ -124,6 +129,36 @@ export const registerValidator = validate(
           options: {
             strict: true,
             strictSeparator: true,
+          },
+        },
+      },
+    },
+    ["body"],
+  ),
+)
+
+export const verifyEmailValidator = validate(
+  checkSchema(
+    {
+      email_verify_token: {
+        custom: {
+          options: async (value, { req }) => {
+            try {
+              if (!value) {
+                throw new UnauthorizedError("Email verify token is required", { token: "Email verify  token is required" })
+              }
+              const decoded_email_verify_token = await verifyToken({
+                token: value,
+                secretOrPublicKey: envConfig.JWT_SECRET_EMAIL_VERIFICATION,
+              })
+              req.decoded_email_verify_token = decoded_email_verify_token
+              return true
+            } catch (error) {
+              if (error instanceof JsonWebTokenError) {
+                throw new UnauthorizedError(capitalize(error.message), error)
+              }
+              throw error
+            }
           },
         },
       },

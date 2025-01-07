@@ -69,30 +69,3 @@ export const refreshTokenValidator = validate(
     ["body"],
   ),
 )
-
-export const emailVerificationValidator = validate(
-  checkSchema(
-    {
-      email_verify_token: {
-        custom: {
-          options: async (value, { req }) => {
-            try {
-              if (!value) {
-                throw new UnauthorizedError("Email verify token is required", { token: "Email verify  token is required" })
-              }
-              const decoded_email_verify_token = await verifyToken({ token: value, secretOrPublicKey: envConfig.JWT_SECRET_EMAIL_VERIFICATION })
-              req.decoded_email_verify_token = decoded_email_verify_token
-              return true
-            } catch (error) {
-              if (error instanceof JsonWebTokenError) {
-                throw new UnauthorizedError(capitalize(error.message), error)
-              }
-              throw error
-            }
-          },
-        },
-      },
-    },
-    ["body"],
-  ),
-)
