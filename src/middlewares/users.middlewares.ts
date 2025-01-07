@@ -149,7 +149,7 @@ export const verifyEmailValidator = validate(
               }
               const decoded_email_verify_token = await verifyToken({
                 token: value,
-                secretOrPublicKey: envConfig.JWT_SECRET_EMAIL_VERIFICATION,
+                secretOrPublicKey: envConfig.EMAIL_VERIFICATION_SECRET_KEY,
               })
               req.decoded_email_verify_token = decoded_email_verify_token
               return true
@@ -159,6 +159,28 @@ export const verifyEmailValidator = validate(
               }
               throw error
             }
+          },
+        },
+      },
+    },
+    ["body"],
+  ),
+)
+
+export const forgotPasswordValidator = validate(
+  checkSchema(
+    {
+      email: {
+        isString: true,
+        trim: true,
+        isEmail: {
+          errorMessage: "Email is invalid",
+        },
+        isLength: {
+          errorMessage: "Email must be between 6 and 255 characters",
+          options: {
+            min: 6,
+            max: 255,
           },
         },
       },

@@ -22,7 +22,7 @@ export const accessTokenValidator = validate(
               if (!accessToken || prefix !== "Bearer") {
                 throw new UnauthorizedError("Invalid token", { token: "Invalid token" })
               }
-              const decoded_authorization = await verifyToken({ token: accessToken, secretOrPublicKey: envConfig.JWT_SECRET_ACCESS_TOKEN })
+              const decoded_authorization = await verifyToken({ token: accessToken, secretOrPublicKey: envConfig.ACCESS_TOKEN_SECRET_KEY })
               req.decoded_authorization = decoded_authorization
               return true
             } catch (error) {
@@ -49,7 +49,7 @@ export const refreshTokenValidator = validate(
               if (!value) {
                 throw new UnauthorizedError("Refresh token is required", { token: "Refresh token is required" })
               }
-              const decoded_refresh_token = await verifyToken({ token: value, secretOrPublicKey: envConfig.JWT_SECRET_REFRESH_TOKEN })
+              const decoded_refresh_token = await verifyToken({ token: value, secretOrPublicKey: envConfig.REFRESH_TOKEN_SECRET_KEY })
               const refresh_token = await userService.checkRefreshTokenExist(value)
               if (!refresh_token) {
                 throw new UnauthorizedError("Invalid token", { token: "Invalid token" })

@@ -16,7 +16,7 @@ class UserService {
         user_id,
         token_type: TokenType.AccessToken,
       },
-      secretOrPublicKey: envConfig.JWT_SECRET_ACCESS_TOKEN,
+      secretOrPublicKey: envConfig.ACCESS_TOKEN_SECRET_KEY,
       options: {
         expiresIn: envConfig.ACCESS_TOKEN_EXPIRES_IN,
       },
@@ -29,19 +29,33 @@ class UserService {
         user_id,
         token_type: TokenType.RefreshToken,
       },
-      secretOrPublicKey: envConfig.JWT_SECRET_REFRESH_TOKEN,
+      secretOrPublicKey: envConfig.REFRESH_TOKEN_SECRET_KEY,
       options: {
         expiresIn: envConfig.REFRESH_TOKEN_EXPIRES_IN,
       },
     })
   }
+
   private signEmailVerifyToken(user_id: string) {
     return signToken({
       payload: {
         user_id,
         token_type: TokenType.EmailVerifyToken,
       },
-      secretOrPublicKey: envConfig.JWT_SECRET_EMAIL_VERIFICATION,
+      secretOrPublicKey: envConfig.EMAIL_VERIFICATION_SECRET_KEY,
+      options: {
+        expiresIn: "5m",
+      },
+    })
+  }
+
+  private signForgotPasswordToken(user_id: string) {
+    return signToken({
+      payload: {
+        user_id,
+        token_type: TokenType.ForgotPasswordToken,
+      },
+      secretOrPublicKey: envConfig.FORGOT_PASSWORD_SECRET_KEY,
       options: {
         expiresIn: "5m",
       },
@@ -128,8 +142,40 @@ class UserService {
     }
     const email_verify_token = await this.signEmailVerifyToken(user_id)
     console.log("send email")
+    console.log(email_verify_token)
     await databaseService.users.updateOne({ _id: user._id }, { $set: { email_verify_token }, $currentDate: { updated_at: true } })
     return "Email verification sent successfully"
+  }
+
+  async forgotPassword(email: string) {
+    const user = await databaseService.users.findOne({ email })
+    if (!user) {
+      throw new NotFoundError("User not found", { email: "User not found" })
+    }
+    const last_send_forgot_password_token = new Date(user.updated_at).getTime()
+    const now = Date.now()
+    if (now - last_send_forgot_password_token < 60000) {
+      throw new BadRequestError("Please wait 1 minute before sending another email", {
+        forgot_password_token: "Please wait 1 minute before sending another email",
+      })
+    }
+    const forgot_password_token = await this.signForgotPasswordToken(user._id.toString())
+    await databaseService.users.updateOne(
+      {
+        _id: user._id,
+      },
+      {
+        $set: {
+          forgot_password_token,
+        },
+        $currentDate: {
+          updated_at: true,
+        },
+      },
+    )
+    console.log("Sent email")
+    console.log(forgot_password_token)
+    return "Forgot password email sent successfully. Please check your email"
   }
 }
 

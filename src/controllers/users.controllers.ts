@@ -45,3 +45,12 @@ export const sendVerifyEmailController = async (req: Request, res: Response, nex
     data: true,
   })
 }
+
+export const forgotPasswordController = async (req: Request, res: Response, next: NextFunction) => {
+  const { email } = req.body
+  const result = await userService.forgotPassword(email)
+  res.json({
+    message: result,
+    data: true,
+  })
+}
