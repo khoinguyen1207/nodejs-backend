@@ -107,7 +107,7 @@ class UserService {
   async verifyEmail(user_id: string) {
     const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
     if (!user) {
-      throw new NotFoundError("User not found", { email_verify_token: "User not found" })
+      throw new NotFoundError("User not found", { message: "User not found" })
     }
     if (user.verify === UserVerifyStatus.Verified) {
       return "Email already verified before"
@@ -121,30 +121,30 @@ class UserService {
         },
       },
     )
-    return "Verify email successfully"
+    return true
   }
 
   async sendVerifyEmail(user_id: string) {
     const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
     if (!user) {
-      throw new NotFoundError("User not found", { email_verify_token: "User not found" })
+      throw new NotFoundError("User not found", { message: "User not found" })
     }
     if (user.verify === UserVerifyStatus.Verified) {
-      return "Email already verified before"
+      throw new BadRequestError("Email already verified before", { message: "Email already verified before" })
     }
+
     // Check time between last send email and now is greater than 1 minute
     const last_send_email = new Date(user.updated_at).getTime()
     const now = Date.now()
     if (now - last_send_email < 60000) {
       throw new BadRequestError("Please wait 1 minute before sending another email", {
-        email_verify_token: "Please wait 1 minute before sending another email",
+        message: "Please wait 1 minute before sending another email",
       })
     }
     const email_verify_token = await this.signEmailVerifyToken(user_id)
-    console.log("send email")
-    console.log(email_verify_token)
+    console.log("send email: ", email_verify_token)
     await databaseService.users.updateOne({ _id: user._id }, { $set: { email_verify_token }, $currentDate: { updated_at: true } })
-    return "Email verification sent successfully"
+    return true
   }
 
   async forgotPassword(email: string) {
@@ -173,9 +173,32 @@ class UserService {
         },
       },
     )
-    console.log("Sent email")
-    console.log(forgot_password_token)
-    return "Forgot password email sent successfully. Please check your email"
+    console.log("Sent email forgot password: ", forgot_password_token)
+    return true
+  }
+
+  async resetPassword(user_id: string, password: string, forgot_password_token: string) {
+    const user = await databaseService.users.findOne({ _id: new ObjectId(user_id), forgot_password_token })
+    if (!user) {
+      throw new BadRequestError("User not found or forgot password token is invalid", {
+        message: "User not found or forgot password token is invalid",
+      })
+    }
+    await databaseService.users.updateOne(
+      {
+        _id: user._id,
+      },
+      {
+        $set: {
+          password: hashPassword(password),
+          forgot_password_token: "",
+        },
+        $currentDate: {
+          updated_at: true,
+        },
+      },
+    )
+    return true
   }
 }
 

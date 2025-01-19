@@ -1,5 +1,4 @@
 import jwt, { JwtPayload } from "jsonwebtoken"
-import { envConfig } from "~/constants/config"
 import { SignTokenPayload, VerifyTokenPayload } from "~/types/jwt"
 
 export const signToken = ({

@@ -30,27 +30,37 @@ export const logoutController = async (req: Request, res: Response, next: NextFu
 
 export const verifyEmailController = async (req: Request, res: Response, next: NextFunction) => {
   const { user_id } = req.decoded_email_verify_token as TokenPayload
-  const result = await userService.verifyEmail(user_id)
+  await userService.verifyEmail(user_id)
   res.json({
-    message: result,
+    message: "Verify email successfully!",
     data: true,
   })
 }
 
 export const sendVerifyEmailController = async (req: Request, res: Response, next: NextFunction) => {
   const { user_id } = req.decoded_authorization as TokenPayload
-  const result = await userService.sendVerifyEmail(user_id)
+  await userService.sendVerifyEmail(user_id)
   res.json({
-    message: result,
+    message: "Send verify email successfully!",
     data: true,
   })
 }
 
 export const forgotPasswordController = async (req: Request, res: Response, next: NextFunction) => {
   const { email } = req.body
-  const result = await userService.forgotPassword(email)
+  await userService.forgotPassword(email)
   res.json({
-    message: result,
+    message: "Forgot password email sent successfully. Please check your email",
+    data: true,
+  })
+}
+
+export const resetPasswordController = async (req: Request, res: Response, next: NextFunction) => {
+  const { user_id } = req.decoded_forgot_password_token as TokenPayload
+  const { password, forgot_password_token } = req.body
+  await userService.resetPassword(user_id, password, forgot_password_token)
+  res.json({
+    message: "Reset password successfully!",
     data: true,
   })
 }

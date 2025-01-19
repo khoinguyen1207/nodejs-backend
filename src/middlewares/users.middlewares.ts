@@ -188,3 +188,66 @@ export const forgotPasswordValidator = validate(
     ["body"],
   ),
 )
+
+export const resetPasswordValidator = validate(
+  checkSchema(
+    {
+      password: {
+        notEmpty: {
+          errorMessage: "Password is required",
+        },
+        isString: true,
+        trim: true,
+        isStrongPassword: {
+          errorMessage: "Password must be at least 6 characters, 1 lowercase, 1 uppercase, 1 number, 1 symbol",
+          options: {
+            minLength: 6,
+            minLowercase: 1,
+            minUppercase: 1,
+            minNumbers: 1,
+            minSymbols: 1,
+            // returnScore: true, // Return độ mạnh password với range điểm
+          },
+        },
+      },
+      confirm_password: {
+        isString: true,
+        notEmpty: {
+          errorMessage: "Confirm password is required",
+        },
+        trim: true,
+        custom: {
+          options: (value, { req }) => {
+            if (value !== req.body.password) {
+              throw new Error("Password confirmation does not match password")
+            }
+            return true
+          },
+        },
+      },
+      forgot_password_token: {
+        notEmpty: {
+          errorMessage: "Forgot password token is required",
+        },
+        custom: {
+          options: async (value, { req }) => {
+            try {
+              const decoded_forgot_password_token = await verifyToken({
+                token: value,
+                secretOrPublicKey: envConfig.FORGOT_PASSWORD_SECRET_KEY,
+              })
+              req.decoded_forgot_password_token = decoded_forgot_password_token
+              return true
+            } catch (error) {
+              if (error instanceof JsonWebTokenError) {
+                throw new UnauthorizedError(capitalize(error.message), error)
+              }
+              throw error
+            }
+          },
+        },
+      },
+    },
+    ["body"],
+  ),
+)
