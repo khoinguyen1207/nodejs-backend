@@ -8,6 +8,7 @@ import {
   sendVerifyEmailController,
   forgotPasswordController,
   resetPasswordController,
+  getProfileController,
 } from "~/controllers/users.controllers"
 import { accessTokenValidator, refreshTokenValidator } from "~/middlewares/auth.middlewares"
 import {
@@ -26,5 +27,6 @@ usersRouter.post("/verify-email", verifyEmailValidator, wrapRequestHandler(verif
 usersRouter.post("/send-verify-email", accessTokenValidator, wrapRequestHandler(sendVerifyEmailController))
 usersRouter.post("/forgot-password", forgotPasswordValidator, wrapRequestHandler(forgotPasswordController))
 usersRouter.post("/reset-password", resetPasswordValidator, wrapRequestHandler(resetPasswordController))
+usersRouter.get("/profile", accessTokenValidator, wrapRequestHandler(getProfileController))
 
 export default usersRouter

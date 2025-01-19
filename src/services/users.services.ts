@@ -200,6 +200,23 @@ class UserService {
     )
     return true
   }
+
+  async getProfile(user_id: string) {
+    const user = await databaseService.users.findOne(
+      { _id: new ObjectId(user_id) },
+      {
+        projection: {
+          password: 0,
+          email_verify_token: 0,
+          forgot_password_token: 0,
+        },
+      },
+    )
+    if (!user) {
+      throw new NotFoundError("User not found", { message: "User not found" })
+    }
+    return user
+  }
 }
 
 const userService = new UserService()
