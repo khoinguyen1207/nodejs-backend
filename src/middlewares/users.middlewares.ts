@@ -145,7 +145,7 @@ export const verifyEmailValidator = validate(
           options: async (value, { req }) => {
             try {
               if (!value) {
-                throw new UnauthorizedError("Email verify token is required", { token: "Email verify  token is required" })
+                throw new UnauthorizedError("Email verify token is required")
               }
               const decoded_email_verify_token = await verifyToken({
                 token: value,
