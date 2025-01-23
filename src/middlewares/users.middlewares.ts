@@ -251,3 +251,114 @@ export const resetPasswordValidator = validate(
     ["body"],
   ),
 )
+
+export const updateProfileValidator = validate(
+  checkSchema(
+    {
+      name: {
+        optional: true,
+        isString: true,
+        trim: true,
+        isLength: {
+          errorMessage: "Name must be between 1 and 255 characters",
+          options: {
+            min: 1,
+            max: 255,
+          },
+        },
+      },
+      date_of_birth: {
+        optional: true,
+        isISO8601: {
+          errorMessage: "Date of birth is invalid",
+          options: {
+            strict: true,
+            strictSeparator: true,
+          },
+        },
+      },
+      bio: {
+        optional: true,
+        isString: true,
+        trim: true,
+        isLength: {
+          errorMessage: "Bio must be between 1 and 255 characters",
+          options: {
+            min: 1,
+            max: 400,
+          },
+        },
+      },
+      location: {
+        optional: true,
+        isString: true,
+        trim: true,
+        isLength: {
+          errorMessage: "Location must be between 1 and 255 characters",
+          options: {
+            min: 1,
+            max: 255,
+          },
+        },
+      },
+      website: {
+        optional: true,
+        isString: true,
+        trim: true,
+        isURL: {
+          errorMessage: "Website is invalid",
+        },
+        isLength: {
+          errorMessage: "Website must be between 1 and 255 characters",
+          options: {
+            min: 1,
+            max: 255,
+          },
+        },
+      },
+      username: {
+        optional: true,
+        isString: true,
+        trim: true,
+        isLength: {
+          errorMessage: "Username must be between 1 and 255 characters",
+          options: {
+            min: 1,
+            max: 255,
+          },
+        },
+      },
+      avatar: {
+        optional: true,
+        isString: true,
+        trim: true,
+        isURL: {
+          errorMessage: "Avatar is invalid",
+        },
+        isLength: {
+          errorMessage: "Avatar must be between 1 and 255 characters",
+          options: {
+            min: 1,
+            max: 255,
+          },
+        },
+      },
+      cover_photo: {
+        optional: true,
+        isString: true,
+        trim: true,
+        isURL: {
+          errorMessage: "Cover photo is invalid",
+        },
+        isLength: {
+          errorMessage: "Cover photo must be between 1 and 255 characters",
+          options: {
+            min: 1,
+            max: 255,
+          },
+        },
+      },
+    },
+    ["body"],
+  ),
+)
