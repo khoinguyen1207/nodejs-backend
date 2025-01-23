@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb"
 import { UserVerifyStatus } from "~/constants/enums"
-import { LoginReqBody, RegisterReqBody } from "~/models/requests/User.request"
+import { LoginReqBody, RegisterReqBody, UpdateProfileReqBody } from "~/models/requests/User.request"
 import RefreshToken from "~/models/schemas/RefreshToken.schema"
 import User from "~/models/schemas/User.schema"
 import authService from "~/services/auth.services"
@@ -161,6 +161,20 @@ class UserService {
       throw new NotFoundError("User not found")
     }
     return user
+  }
+
+  async updateProfile(user_id: string, body: UpdateProfileReqBody) {
+    const user = (await databaseService.users.findOne({ _id: new ObjectId(user_id) })) as User
+    await databaseService.users.updateOne(
+      { _id: user._id },
+      {
+        $set: {},
+        $currentDate: {
+          updated_at: true,
+        },
+      },
+    )
+    return true
   }
 }
 
