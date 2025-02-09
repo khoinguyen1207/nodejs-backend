@@ -285,7 +285,7 @@ export const updateProfileValidator = validate(
           errorMessage: "Bio must be between 1 and 255 characters",
           options: {
             min: 1,
-            max: 400,
+            max: 255,
           },
         },
       },
@@ -294,9 +294,9 @@ export const updateProfileValidator = validate(
         isString: true,
         trim: true,
         isLength: {
-          errorMessage: "Location must be between 1 and 255 characters",
+          errorMessage: "Location must be between 5 and 255 characters",
           options: {
-            min: 1,
+            min: 5,
             max: 255,
           },
         },
@@ -305,13 +305,10 @@ export const updateProfileValidator = validate(
         optional: true,
         isString: true,
         trim: true,
-        isURL: {
-          errorMessage: "Website is invalid",
-        },
         isLength: {
-          errorMessage: "Website must be between 1 and 255 characters",
+          errorMessage: "Website must be between 5 and 255 characters",
           options: {
-            min: 1,
+            min: 5,
             max: 255,
           },
         },
@@ -321,9 +318,9 @@ export const updateProfileValidator = validate(
         isString: true,
         trim: true,
         isLength: {
-          errorMessage: "Username must be between 1 and 255 characters",
+          errorMessage: "Username must be between 5 and 255 characters",
           options: {
-            min: 1,
+            min: 5,
             max: 255,
           },
         },
@@ -332,14 +329,11 @@ export const updateProfileValidator = validate(
         optional: true,
         isString: true,
         trim: true,
-        isURL: {
-          errorMessage: "Avatar is invalid",
-        },
         isLength: {
-          errorMessage: "Avatar must be between 1 and 255 characters",
+          errorMessage: "Avatar must be between 5 and 400 characters",
           options: {
-            min: 1,
-            max: 255,
+            min: 5,
+            max: 400,
           },
         },
       },
@@ -347,14 +341,11 @@ export const updateProfileValidator = validate(
         optional: true,
         isString: true,
         trim: true,
-        isURL: {
-          errorMessage: "Cover photo is invalid",
-        },
         isLength: {
-          errorMessage: "Cover photo must be between 1 and 255 characters",
+          errorMessage: "Cover photo must be between 1 and 400 characters",
           options: {
             min: 1,
-            max: 255,
+            max: 400,
           },
         },
       },

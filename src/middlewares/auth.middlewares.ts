@@ -3,7 +3,7 @@ import { JsonWebTokenError } from "jsonwebtoken"
 import { UnauthorizedError } from "~/utils/error-handler"
 import { verifyToken } from "~/utils/jwt"
 import { validate } from "~/utils/validation"
-import { capitalize } from "lodash"
+import { capitalize, pick } from "lodash"
 import userService from "~/services/users.services"
 import { envConfig } from "~/constants/config"
 import { TokenPayload } from "~/types/jwt"
@@ -88,5 +88,12 @@ export const verifiedUserValidator = async (req: Request, res: Response, next: N
     next()
   } catch (error) {
     next(error)
+  }
+}
+
+export const filterMiddleware = (fields: string[]) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    req.body = pick(req.body, fields)
+    next()
   }
 }

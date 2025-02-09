@@ -22,15 +22,20 @@ class UserService {
 
   // Register user
   async register(payload: RegisterReqBody) {
-    const result = await databaseService.users.insertOne(
+    const user_id = new ObjectId()
+    await databaseService.users.insertOne(
       new User({
         ...payload,
+        _id: user_id,
+        username: `user${user_id.toString()}`,
         date_of_birth: new Date(payload.date_of_birth),
         password: hashPassword(payload.password),
       }),
     )
-    const user_id = result.insertedId.toString()
-    const [access_token, refresh_token] = await Promise.all([authService.signAccessToken(user_id), authService.signRefreshToken(user_id)])
+    const [access_token, refresh_token] = await Promise.all([
+      authService.signAccessToken(user_id.toString()),
+      authService.signRefreshToken(user_id.toString()),
+    ])
     const newRefreshToken = new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token })
     await databaseService.refresh_tokens.insertOne(newRefreshToken)
     return { access_token, refresh_token }
@@ -164,17 +169,50 @@ class UserService {
   }
 
   async updateProfile(user_id: string, body: UpdateProfileReqBody) {
-    const user = (await databaseService.users.findOne({ _id: new ObjectId(user_id) })) as User
-    await databaseService.users.updateOne(
-      { _id: user._id },
+    const payload = body.date_of_birth ? { ...body, date_of_birth: new Date(body.date_of_birth) } : body
+    const user = await databaseService.users.findOneAndUpdate(
+      { _id: new ObjectId(user_id) },
       {
-        $set: {},
+        $set: {
+          ...(payload as UpdateProfileReqBody & { date_of_birth?: Date }),
+        },
         $currentDate: {
           updated_at: true,
         },
       },
+      {
+        returnDocument: "after",
+        projection: {
+          password: 0,
+          email_verify_token: 0,
+          forgot_password_token: 0,
+        },
+      },
     )
-    return true
+    return user
+  }
+
+  async getUserInfo(username: string) {
+    const user = await databaseService.users.findOne(
+      {
+        username,
+      },
+      {
+        projection: {
+          password: 0,
+          email_verify_token: 0,
+          forgot_password_token: 0,
+          verify: 0,
+          created_at: 0,
+          updated_at: 0,
+          email: 0,
+        },
+      },
+    )
+    if (!user) {
+      throw new NotFoundError("User not found")
+    }
+    return user
   }
 }
 
