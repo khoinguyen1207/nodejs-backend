@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb"
 import { UserVerifyStatus } from "~/constants/enums"
-import { LoginReqBody, RegisterReqBody, UpdateProfileReqBody } from "~/models/requests/User.request"
+import { FollowReqBody, LoginReqBody, RegisterReqBody, UpdateProfileReqBody } from "~/models/requests/User.request"
+import Follower from "~/models/schemas/Follower.schema"
 import RefreshToken from "~/models/schemas/RefreshToken.schema"
 import User from "~/models/schemas/User.schema"
 import authService from "~/services/auth.services"
@@ -213,6 +214,25 @@ class UserService {
       throw new NotFoundError("User not found")
     }
     return user
+  }
+
+  async follow(payload: FollowReqBody) {
+    const { user_id, followed_user_id } = payload
+    const user = await databaseService.followers.findOne({
+      user_id: new ObjectId(user_id),
+      followed_user_id: new ObjectId(followed_user_id),
+    })
+    if (user) {
+      throw new BadRequestError("User already followed")
+    }
+
+    await databaseService.followers.insertOne(
+      new Follower({
+        user_id: new ObjectId(user_id),
+        followed_user_id: new ObjectId(followed_user_id),
+      }),
+    )
+    return true
   }
 }
 

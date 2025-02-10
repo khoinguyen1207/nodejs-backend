@@ -1,9 +1,11 @@
 import { checkSchema } from "express-validator"
 import { JsonWebTokenError } from "jsonwebtoken"
 import { capitalize } from "lodash"
+import { ObjectId } from "mongodb"
 import { envConfig } from "~/constants/config"
+import databaseService from "~/services/database.services"
 import userService from "~/services/users.services"
-import { UnauthorizedError } from "~/utils/error-handler"
+import { BadRequestError, NotFoundError, UnauthorizedError } from "~/utils/error-handler"
 import { verifyToken } from "~/utils/jwt"
 import { validate } from "~/utils/validation"
 
@@ -352,4 +354,28 @@ export const updateProfileValidator = validate(
     },
     ["body"],
   ),
+)
+
+export const followValidator = validate(
+  checkSchema({
+    followed_user_id: {
+      custom: {
+        options: async (value: string, { req }) => {
+          if (!ObjectId.isValid(value)) {
+            throw new BadRequestError("Followed user id is invalid")
+          }
+          const followed_user = await databaseService.users.findOne({
+            _id: new ObjectId(value),
+          })
+          if (!followed_user) {
+            throw new NotFoundError("User not found")
+          }
+          if (value === req.decoded_authorization.user_id) {
+            throw new BadRequestError("You cannot follow yourself")
+          }
+          return true
+        },
+      },
+    },
+  }),
 )

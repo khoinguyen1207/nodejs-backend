@@ -21,3 +21,8 @@ export interface UpdateProfileReqBody {
   avatar?: string
   cover_photo?: string
 }
+
+export interface FollowReqBody {
+  user_id: string
+  followed_user_id: string
+}
