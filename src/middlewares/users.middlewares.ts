@@ -3,6 +3,7 @@ import { JsonWebTokenError } from "jsonwebtoken"
 import { capitalize } from "lodash"
 import { ObjectId } from "mongodb"
 import { envConfig } from "~/constants/config"
+import { REGEX_USERNAME } from "~/constants/regex"
 import databaseService from "~/services/database.services"
 import userService from "~/services/users.services"
 import { BadRequestError, NotFoundError, UnauthorizedError } from "~/utils/error-handler"
@@ -319,11 +320,18 @@ export const updateProfileValidator = validate(
         optional: true,
         isString: true,
         trim: true,
-        isLength: {
-          errorMessage: "Username must be between 5 and 255 characters",
-          options: {
-            min: 5,
-            max: 255,
+        custom: {
+          options: async (value, { req }) => {
+            if (!REGEX_USERNAME.test(value)) {
+              throw Error("Username is invalid (only contains a-z, A-Z, 0-9, _)")
+            }
+            const user = await databaseService.users.findOne({
+              username: value,
+              _id: { $ne: new ObjectId(req.decoded_authorization.user_id) },
+            })
+            if (user) {
+              throw Error("Username is already exist")
+            }
           },
         },
       },
