@@ -222,16 +222,28 @@ class UserService {
       user_id: new ObjectId(user_id),
       followed_user_id: new ObjectId(followed_user_id),
     })
-    if (user) {
-      throw new BadRequestError("User already followed")
-    }
-
+    if (user) return true
     await databaseService.followers.insertOne(
       new Follower({
         user_id: new ObjectId(user_id),
         followed_user_id: new ObjectId(followed_user_id),
       }),
     )
+    return true
+  }
+
+  async unFollow({ user_id, followed_user_id }: FollowReqBody) {
+    const user = await databaseService.followers.findOne({
+      user_id: new ObjectId(user_id),
+      followed_user_id: new ObjectId(followed_user_id),
+    })
+    if (!user) {
+      throw new BadRequestError("Already unfollowed")
+    }
+    await databaseService.followers.deleteOne({
+      user_id: new ObjectId(user_id),
+      followed_user_id: new ObjectId(followed_user_id),
+    })
     return true
   }
 }

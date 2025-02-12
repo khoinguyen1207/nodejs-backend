@@ -357,25 +357,46 @@ export const updateProfileValidator = validate(
 )
 
 export const followValidator = validate(
-  checkSchema({
-    followed_user_id: {
-      custom: {
-        options: async (value: string, { req }) => {
-          if (!ObjectId.isValid(value)) {
-            throw new BadRequestError("Followed user id is invalid")
-          }
-          const followed_user = await databaseService.users.findOne({
-            _id: new ObjectId(value),
-          })
-          if (!followed_user) {
-            throw new NotFoundError("User not found")
-          }
-          if (value === req.decoded_authorization.user_id) {
-            throw new BadRequestError("You cannot follow yourself")
-          }
-          return true
+  checkSchema(
+    {
+      followed_user_id: {
+        custom: {
+          options: async (value: string, { req }) => {
+            if (!ObjectId.isValid(value)) {
+              throw new BadRequestError("Followed user id is invalid")
+            }
+            const followed_user = await databaseService.users.findOne({
+              _id: new ObjectId(value),
+            })
+            if (!followed_user) {
+              throw new NotFoundError("User not found")
+            }
+            if (value === req.decoded_authorization.user_id) {
+              throw new BadRequestError("You cannot follow yourself")
+            }
+            return true
+          },
         },
       },
     },
-  }),
+    ["body"],
+  ),
+)
+
+export const unFollowValidator = validate(
+  checkSchema(
+    {
+      user_id: {
+        custom: {
+          options: async (value: string, { req }) => {
+            if (!ObjectId.isValid(value)) {
+              throw new BadRequestError("User id is invalid")
+            }
+            return true
+          },
+        },
+      },
+    },
+    ["params"],
+  ),
 )
