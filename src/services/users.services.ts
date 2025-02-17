@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb"
 import { UserVerifyStatus } from "~/constants/enums"
-import { FollowReqBody, LoginReqBody, RegisterReqBody, UpdateProfileReqBody } from "~/models/requests/User.request"
+import { ChangePasswordReqBody, FollowReqBody, LoginReqBody, RegisterReqBody, UpdateProfileReqBody } from "~/models/requests/User.request"
 import Follower from "~/models/schemas/Follower.schema"
 import RefreshToken from "~/models/schemas/RefreshToken.schema"
 import User from "~/models/schemas/User.schema"
@@ -244,6 +244,33 @@ class UserService {
       user_id: new ObjectId(user_id),
       followed_user_id: new ObjectId(followed_user_id),
     })
+    return true
+  }
+
+  async changePassword(user_id: string, payload: ChangePasswordReqBody) {
+    const user = await databaseService.users.findOne({
+      _id: new ObjectId(user_id),
+    })
+    if (!user) {
+      throw new NotFoundError("User not found")
+    }
+    if (user.password !== hashPassword(payload.old_password)) {
+      throw new BadRequestError("Old password not match")
+    }
+
+    await databaseService.users.updateOne(
+      {
+        _id: new ObjectId(user_id),
+      },
+      {
+        $set: {
+          password: hashPassword(payload.password),
+        },
+        $currentDate: {
+          updated_at: true,
+        },
+      },
+    )
     return true
   }
 }

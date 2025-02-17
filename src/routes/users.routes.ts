@@ -13,9 +13,11 @@ import {
   getUserInfoController,
   followController,
   unFollowController,
+  changePasswordController,
 } from "~/controllers/users.controllers"
 import { accessTokenValidator, filterMiddleware, refreshTokenValidator, verifiedUserValidator } from "~/middlewares/auth.middlewares"
 import {
+  changePasswordValidator,
   followValidator,
   forgotPasswordValidator,
   loginValidator,
@@ -56,6 +58,14 @@ usersRouter.delete(
   verifiedUserValidator,
   unFollowValidator,
   wrapRequestHandler(unFollowController),
+)
+
+usersRouter.put(
+  "/change-password",
+  accessTokenValidator,
+  verifiedUserValidator,
+  changePasswordValidator,
+  wrapRequestHandler(changePasswordController),
 )
 
 export default usersRouter

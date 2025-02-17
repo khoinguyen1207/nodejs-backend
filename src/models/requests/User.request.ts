@@ -26,3 +26,9 @@ export interface FollowReqBody {
   user_id: string
   followed_user_id: string
 }
+
+export interface ChangePasswordReqBody {
+  old_password: string
+  password: string
+  confirm_password: string
+}

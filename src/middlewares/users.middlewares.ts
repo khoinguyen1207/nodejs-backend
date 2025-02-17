@@ -396,7 +396,7 @@ export const unFollowValidator = validate(
     {
       user_id: {
         custom: {
-          options: async (value: string, { req }) => {
+          options: async (value: string) => {
             if (!ObjectId.isValid(value)) {
               throw new BadRequestError("User id is invalid")
             }
@@ -406,5 +406,53 @@ export const unFollowValidator = validate(
       },
     },
     ["params"],
+  ),
+)
+
+export const changePasswordValidator = validate(
+  checkSchema(
+    {
+      old_password: {
+        notEmpty: {
+          errorMessage: "Old password is required",
+        },
+        isString: true,
+        trim: true,
+      },
+      password: {
+        notEmpty: {
+          errorMessage: "Password is required",
+        },
+        isString: true,
+        trim: true,
+        isStrongPassword: {
+          errorMessage: "Password must be at least 6 characters, 1 lowercase, 1 uppercase, 1 number, 1 symbol",
+          options: {
+            minLength: 6,
+            minLowercase: 1,
+            minUppercase: 1,
+            minNumbers: 1,
+            minSymbols: 1,
+            // returnScore: true, // Return độ mạnh password với range điểm
+          },
+        },
+      },
+      confirm_password: {
+        notEmpty: {
+          errorMessage: "Confirm password is required",
+        },
+        isString: true,
+        trim: true,
+        custom: {
+          options: (value, { req }) => {
+            if (value !== req.body.password) {
+              throw new Error("Password confirmation does not match password")
+            }
+            return true
+          },
+        },
+      },
+    },
+    ["body"],
   ),
 )
