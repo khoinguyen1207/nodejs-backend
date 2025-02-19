@@ -15,6 +15,14 @@ class UserService {
     return Boolean(result)
   }
 
+  async checkUserExist(user_id: string) {
+    const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
+    if (!user) {
+      throw new NotFoundError("User not found")
+    }
+    return user
+  }
+
   // Check refresh token exist
   async checkRefreshTokenExist(refresh_token: string) {
     const result = await databaseService.refresh_tokens.findOne({ token: refresh_token })
@@ -60,10 +68,7 @@ class UserService {
   }
 
   async verifyEmail(user_id: string) {
-    const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
-    if (!user) {
-      throw new NotFoundError("User not found")
-    }
+    const user = await this.checkUserExist(user_id)
     if (user.verify === UserVerifyStatus.Verified) {
       return "Email already verified before"
     }
@@ -80,10 +85,7 @@ class UserService {
   }
 
   async sendVerifyEmail(user_id: string) {
-    const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
-    if (!user) {
-      throw new NotFoundError("User not found")
-    }
+    const user = await this.checkUserExist(user_id)
     if (user.verify === UserVerifyStatus.Verified) {
       throw new BadRequestError("Email already verified before")
     }
@@ -248,12 +250,7 @@ class UserService {
   }
 
   async changePassword(user_id: string, payload: ChangePasswordReqBody) {
-    const user = await databaseService.users.findOne({
-      _id: new ObjectId(user_id),
-    })
-    if (!user) {
-      throw new NotFoundError("User not found")
-    }
+    const user = await this.checkUserExist(user_id)
     if (user.password !== hashPassword(payload.old_password)) {
       throw new BadRequestError("Old password not match")
     }
