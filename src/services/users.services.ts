@@ -1,13 +1,11 @@
 import { ObjectId } from "mongodb"
 import { UserVerifyStatus } from "~/constants/enums"
-import { ChangePasswordReqBody, FollowReqBody, LoginReqBody, RegisterReqBody, UpdateProfileReqBody } from "~/models/requests/User.request"
+import { ChangePasswordReqBody, FollowReqBody, UpdateProfileReqBody } from "~/models/requests/User.request"
 import Follower from "~/models/schemas/Follower.schema"
-import RefreshToken from "~/models/schemas/RefreshToken.schema"
-import User from "~/models/schemas/User.schema"
 import authService from "~/services/auth.services"
 import databaseService from "~/services/database.services"
 import { hashPassword } from "~/utils/crypto"
-import { BadRequestError, NotFoundError, UnprocessableEntityError } from "~/utils/error-handler"
+import { BadRequestError, NotFoundError } from "~/utils/error-handler"
 
 class UserService {
   async checkEmailExist(email: string) {
@@ -26,44 +24,6 @@ class UserService {
   // Check refresh token exist
   async checkRefreshTokenExist(refresh_token: string) {
     const result = await databaseService.refresh_tokens.findOne({ token: refresh_token })
-    return Boolean(result)
-  }
-
-  // Register user
-  async register(payload: RegisterReqBody) {
-    const user_id = new ObjectId()
-    await databaseService.users.insertOne(
-      new User({
-        ...payload,
-        _id: user_id,
-        username: `user${user_id.toString()}`,
-        date_of_birth: new Date(payload.date_of_birth),
-        password: hashPassword(payload.password),
-      }),
-    )
-    const [access_token, refresh_token] = await Promise.all([
-      authService.signAccessToken(user_id.toString()),
-      authService.signRefreshToken(user_id.toString()),
-    ])
-    const newRefreshToken = new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token })
-    await databaseService.refresh_tokens.insertOne(newRefreshToken)
-    return { access_token, refresh_token }
-  }
-
-  async login(payload: LoginReqBody) {
-    const user = await databaseService.users.findOne({ email: payload.email, password: hashPassword(payload.password) })
-    if (!user) {
-      throw new UnprocessableEntityError("Email or password is incorrect", { email: "Email or password is incorrect" })
-    }
-    const user_id = user._id.toString()
-    const [access_token, refresh_token] = await Promise.all([authService.signAccessToken(user_id), authService.signRefreshToken(user_id)])
-    const newRefreshToken = new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token })
-    await databaseService.refresh_tokens.insertOne(newRefreshToken)
-    return { access_token, refresh_token }
-  }
-
-  async logout(refresh_token: string) {
-    const result = await databaseService.refresh_tokens.deleteOne({ token: refresh_token })
     return Boolean(result)
   }
 

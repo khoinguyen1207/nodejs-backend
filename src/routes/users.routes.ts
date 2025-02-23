@@ -1,10 +1,10 @@
 import { Router } from "express"
 const usersRouter = Router()
+
+import { accessTokenValidator, filterMiddleware, verifiedUserValidator } from "~/middlewares/auth.middlewares"
+import { wrapRequestHandler } from "~/utils/error-handler"
 import {
   verifyEmailController,
-  loginController,
-  logoutController,
-  registerController,
   sendVerifyEmailController,
   forgotPasswordController,
   resetPasswordController,
@@ -15,28 +15,16 @@ import {
   unFollowController,
   changePasswordController,
 } from "~/controllers/users.controllers"
-import { accessTokenValidator, filterMiddleware, refreshTokenValidator, verifiedUserValidator } from "~/middlewares/auth.middlewares"
 import {
   changePasswordValidator,
   followValidator,
   forgotPasswordValidator,
-  loginValidator,
-  registerValidator,
   resetPasswordValidator,
   unFollowValidator,
   updateProfileValidator,
   verifyEmailValidator,
 } from "~/middlewares/users.middlewares"
-import { wrapRequestHandler } from "~/utils/error-handler"
 
-usersRouter.post("/login", loginValidator, wrapRequestHandler(loginController))
-usersRouter.post(
-  "/register",
-  registerValidator,
-  filterMiddleware(["email", "password", "confirm_password", "name", "date_of_birth"]),
-  wrapRequestHandler(registerController),
-)
-usersRouter.post("/logout", accessTokenValidator, refreshTokenValidator, wrapRequestHandler(logoutController))
 usersRouter.post("/verify-email", verifyEmailValidator, wrapRequestHandler(verifyEmailController))
 usersRouter.post("/send-verify-email", accessTokenValidator, wrapRequestHandler(sendVerifyEmailController))
 usersRouter.post("/forgot-password", forgotPasswordValidator, wrapRequestHandler(forgotPasswordController))
