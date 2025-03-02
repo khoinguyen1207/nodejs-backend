@@ -7,7 +7,8 @@ import databaseService from "~/services/database.services"
 import User from "~/models/schemas/User.schema"
 import { hashPassword } from "~/utils/crypto"
 import RefreshToken from "~/models/schemas/RefreshToken.schema"
-import { UnprocessableEntityError } from "~/utils/error-handler"
+import { BadRequestError, UnprocessableEntityError } from "~/utils/error-handler"
+import { client } from "~/utils/oauth"
 
 class AuthService {
   async signAccessToken(user_id: string) {
@@ -87,9 +88,11 @@ class AuthService {
     if (!user) {
       throw new UnprocessableEntityError("Email or password is incorrect", { email: "Email or password is incorrect" })
     }
-    const user_id = user._id.toString()
-    const [access_token, refresh_token] = await Promise.all([authService.signAccessToken(user_id), authService.signRefreshToken(user_id)])
-    const newRefreshToken = new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token })
+    const [access_token, refresh_token] = await Promise.all([
+      authService.signAccessToken(user._id.toString()),
+      authService.signRefreshToken(user._id.toString()),
+    ])
+    const newRefreshToken = new RefreshToken({ user_id: user._id, token: refresh_token })
     await databaseService.refresh_tokens.insertOne(newRefreshToken)
     return { access_token, refresh_token }
   }
@@ -97,6 +100,77 @@ class AuthService {
   async logout(refresh_token: string) {
     const result = await databaseService.refresh_tokens.deleteOne({ token: refresh_token })
     return Boolean(result)
+  }
+
+  // private async getGoogleOauthToken(code: string) {
+  //   const body = {
+  //     code,
+  //     client_id: envConfig.GOOGLE_CLIENT_ID,
+  //     client_secret: envConfig.GOOGLE_CLIENT_SECRET,
+  //     redirect_uri: envConfig.GOOGLE_REDIRECT_URI,
+  //     grant_type: "authorization_code",
+  //   }
+
+  //   const { data } = await axios.post("https://oauth2.googleapis.com/token", body, {
+  //     headers: {
+  //       "Content-Type": "application/x-www-form-urlencoded",
+  //     },
+  //   })
+  //   console.log(data)
+  //   return data as GoogleOauthTokenRes
+  // }
+
+  // private async getGoogleUserInfo(access_token: string) {
+  //   const { data } = await axios.get("https://www.googleapis.com/oauth2/v1/userinfo", {
+  //     params: {
+  //       alt: "json",
+  //     },
+  //     headers: {
+  //       Authorization: `Bearer ${access_token}`,
+  //     },
+  //   })
+  //   console.log(data)
+  //   return data as GoogleOauthUserInfoRes
+  // }
+
+  async oauthGoogle(code: string) {
+    if (!code) throw new BadRequestError("Code is required")
+
+    // Get token from code and verify id token
+    const { tokens } = await client.getToken(code)
+    const ticket = await client.verifyIdToken({
+      idToken: tokens.id_token!,
+      audience: envConfig.GOOGLE_CLIENT_ID,
+    })
+    const payload = ticket.getPayload()
+    if (!payload) throw new BadRequestError("Invalid token")
+    const { email, email_verified, name } = payload
+
+    // Check if email is verified
+    if (!email_verified) throw new BadRequestError("Email is not verified")
+
+    // Check if user exists
+    const user = await databaseService.users.findOne({ email })
+    const user_id = user ? user._id : new ObjectId()
+    if (!user) {
+      const password = hashPassword(Math.random().toString(36).substring(2, 10))
+      await databaseService.users.insertOne(
+        new User({
+          _id: user_id,
+          email: email!,
+          password: password,
+          username: `user${user_id.toString()}`,
+          name: name!,
+        }),
+      )
+    }
+    const [access_token, refresh_token] = await Promise.all([
+      authService.signAccessToken(user_id.toString()),
+      authService.signRefreshToken(user_id.toString()),
+    ])
+    const newRefreshToken = new RefreshToken({ user_id: user_id, token: refresh_token })
+    await databaseService.refresh_tokens.insertOne(newRefreshToken)
+    return { access_token, refresh_token }
   }
 }
 

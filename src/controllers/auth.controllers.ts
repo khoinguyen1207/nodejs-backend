@@ -28,8 +28,10 @@ export const logoutController = async (req: Request, res: Response, next: NextFu
 }
 
 export const oauthController = async (req: Request, res: Response, next: NextFunction) => {
-  console.log(req.query)
+  const { code } = req.body
+  const result = await authService.oauthGoogle(code as string)
   res.json({
     message: "Login successful!",
+    data: result,
   })
 }
