@@ -9,6 +9,7 @@ import { hashPassword } from "~/utils/crypto"
 import RefreshToken from "~/models/schemas/RefreshToken.schema"
 import { BadRequestError, UnprocessableEntityError } from "~/utils/error-handler"
 import { client } from "~/utils/oauth"
+import { capitalize } from "lodash"
 
 class AuthService {
   async signAccessToken(user_id: string) {
@@ -75,8 +76,8 @@ class AuthService {
       }),
     )
     const [access_token, refresh_token] = await Promise.all([
-      authService.signAccessToken(user_id.toString()),
-      authService.signRefreshToken(user_id.toString()),
+      this.signAccessToken(user_id.toString()),
+      this.signRefreshToken(user_id.toString()),
     ])
     const newRefreshToken = new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token })
     await databaseService.refresh_tokens.insertOne(newRefreshToken)
@@ -89,8 +90,8 @@ class AuthService {
       throw new UnprocessableEntityError("Email or password is incorrect", { email: "Email or password is incorrect" })
     }
     const [access_token, refresh_token] = await Promise.all([
-      authService.signAccessToken(user._id.toString()),
-      authService.signRefreshToken(user._id.toString()),
+      this.signAccessToken(user._id.toString()),
+      this.signRefreshToken(user._id.toString()),
     ])
     const newRefreshToken = new RefreshToken({ user_id: user._id, token: refresh_token })
     await databaseService.refresh_tokens.insertOne(newRefreshToken)
@@ -133,11 +134,20 @@ class AuthService {
   //   return data as GoogleOauthUserInfoRes
   // }
 
+  private async getOauthToken(code: string) {
+    try {
+      const { tokens } = await client.getToken(code)
+      return tokens
+    } catch (error: any) {
+      throw new BadRequestError(capitalize(error.response.data.error))
+    }
+  }
+
   async oauthGoogle(code: string) {
     if (!code) throw new BadRequestError("Code is required")
 
     // Get token from code and verify id token
-    const { tokens } = await client.getToken(code)
+    const tokens = await this.getOauthToken(code)
     const ticket = await client.verifyIdToken({
       idToken: tokens.id_token!,
       audience: envConfig.GOOGLE_CLIENT_ID,
@@ -149,7 +159,7 @@ class AuthService {
     // Check if email is verified
     if (!email_verified) throw new BadRequestError("Email is not verified")
 
-    // Check if user exists
+    // Check if user exists, if not, create new user
     const user = await databaseService.users.findOne({ email })
     const user_id = user ? user._id : new ObjectId()
     if (!user) {
@@ -164,9 +174,11 @@ class AuthService {
         }),
       )
     }
+
+    // Generate tokens
     const [access_token, refresh_token] = await Promise.all([
-      authService.signAccessToken(user_id.toString()),
-      authService.signRefreshToken(user_id.toString()),
+      this.signAccessToken(user_id.toString()),
+      this.signRefreshToken(user_id.toString()),
     ])
     const newRefreshToken = new RefreshToken({ user_id: user_id, token: refresh_token })
     await databaseService.refresh_tokens.insertOne(newRefreshToken)
