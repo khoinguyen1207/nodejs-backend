@@ -22,7 +22,7 @@ export function handleUploadSingleImage(req: Request) {
     filter: ({ name, originalFilename, mimetype }) => {
       const valid = name === "image" && Boolean(mimetype?.includes("image"))
       if (!valid) {
-        form.emit("error" as any, new BadRequestError("Invalid file type.") as any)
+        form.emit("error" as any, new BadRequestError("Invalid file type") as any)
       }
       return valid
     },

@@ -14,10 +14,10 @@ export function wrapRequestHandler(func: RequestHandler) {
 
 export class DefaultError {
   message: string
-  status: number
-  code: string
+  status: httpStatus
+  code: ErrorCodes
   error?: any
-  constructor(message: string, status: number, code: string, error?: any) {
+  constructor(message: string, status: httpStatus, code: ErrorCodes, error?: any) {
     this.message = message
     this.status = status
     this.code = code
