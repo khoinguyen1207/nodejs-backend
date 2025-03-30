@@ -1,5 +1,5 @@
 import { NextFunction, Request, RequestHandler, Response } from "express"
-import { ErrorCodes } from "~/constants/enums"
+import { ErrorCodes } from "~/types/enums"
 import { httpStatus } from "~/constants/httpStatus"
 
 export function wrapRequestHandler(func: RequestHandler) {

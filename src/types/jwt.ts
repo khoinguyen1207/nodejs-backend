@@ -1,5 +1,5 @@
 import { JwtPayload, SignOptions } from "jsonwebtoken"
-import { TokenType } from "~/constants/enums"
+import { TokenType } from "~/types/enums"
 
 export interface SignTokenPayload {
   payload: string | Buffer | object

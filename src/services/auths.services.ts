@@ -1,6 +1,6 @@
 import { envConfig } from "~/constants/config"
 import { signToken } from "~/utils/jwt"
-import { TokenType } from "~/constants/enums"
+import { TokenType } from "~/types/enums"
 import { LoginReqBody, RegisterReqBody } from "~/models/requests/Auth.requests"
 import { ObjectId } from "mongodb"
 import databaseService from "~/services/database.services"

@@ -12,12 +12,13 @@ export function initUploadsFolder() {
   }
 }
 
-export function handleUploadSingleImage(req: Request) {
+export function handleUploadImage(req: Request) {
   const form = formidable({
     uploadDir: UPLOAD_DIR_TEMP,
-    maxFiles: 1,
+    maxFiles: 4,
     keepExtensions: true,
-    maxFileSize: 5000 * 1024, // 500KB
+    maxFileSize: 500 * 1024, // 500KB
+    maxTotalFileSize: 500 * 1024 * 4,
     filter: ({ name, originalFilename, mimetype }) => {
       const valid = name === "image" && Boolean(mimetype?.includes("image"))
       if (!valid) {
@@ -26,7 +27,7 @@ export function handleUploadSingleImage(req: Request) {
       return valid
     },
   })
-  return new Promise<File>((resolve, reject) => {
+  return new Promise<File[]>((resolve, reject) => {
     form.parse(req, (err, fields, files) => {
       console.log("files", files)
       if (err) {
@@ -35,7 +36,7 @@ export function handleUploadSingleImage(req: Request) {
       if (!files.image) {
         return reject(new BadRequestError("File not found"))
       }
-      resolve((files.image as File[])[0])
+      resolve(files.image)
     })
   })
 }

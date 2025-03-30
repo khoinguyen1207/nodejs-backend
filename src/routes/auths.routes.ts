@@ -1,7 +1,7 @@
 import { Router } from "express"
 const authRouter = Router()
 
-import { loginController, logoutController, oauthController, registerController } from "~/controllers/auth.controllers"
+import { loginController, logoutController, oauthController, registerController } from "~/controllers/auths.controllers"
 import { wrapRequestHandler } from "~/utils/error-handler"
 import {
   accessTokenValidator,

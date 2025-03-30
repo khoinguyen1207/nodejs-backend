@@ -6,7 +6,7 @@ import { initUploadsFolder } from "~/utils/file"
 import { UPLOAD_DIR } from "~/constants/dir"
 
 import usersRouter from "~/routes/users.routes"
-import authRouter from "~/routes/auth.routes"
+import authsRouter from "~/routes/auths.routes"
 import mediasRouter from "~/routes/medias.routes"
 import databaseService from "~/services/database.services"
 import staticsRouter from "~/routes/statics.routes"
@@ -21,7 +21,7 @@ app.use(cors())
 
 // Routes
 app.use("/users", usersRouter)
-app.use("/auth", authRouter)
+app.use("/auths", authsRouter)
 app.use("/medias", mediasRouter)
 app.use("/images", express.static(UPLOAD_DIR))
 app.use("/statics", staticsRouter)

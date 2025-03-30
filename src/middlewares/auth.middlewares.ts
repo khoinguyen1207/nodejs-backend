@@ -9,7 +9,7 @@ import { envConfig } from "~/constants/config"
 import { TokenPayload } from "~/types/jwt"
 import databaseService from "~/services/database.services"
 import { ObjectId } from "mongodb"
-import { UserVerifyStatus } from "~/constants/enums"
+import { UserVerifyStatus } from "~/types/enums"
 import { NextFunction, Request, Response } from "express"
 
 export const accessTokenValidator = validate(
