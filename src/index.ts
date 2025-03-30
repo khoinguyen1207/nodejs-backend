@@ -3,7 +3,7 @@ import cors from "cors"
 import { defaultErrorHandler } from "~/middlewares/error.middlewares"
 import { envConfig } from "~/constants/config"
 import { initUploadsFolder } from "~/utils/file"
-import { UPLOAD_DIR } from "~/constants/dir"
+// import { UPLOAD_DIR } from "~/constants/dir"
 
 import usersRouter from "~/routes/users.routes"
 import authsRouter from "~/routes/auths.routes"
@@ -23,8 +23,8 @@ app.use(cors())
 app.use("/users", usersRouter)
 app.use("/auths", authsRouter)
 app.use("/medias", mediasRouter)
-app.use("/images", express.static(UPLOAD_DIR))
 app.use("/statics", staticsRouter)
+// app.use("/images", express.static(UPLOAD_DIR))
 
 app.use(defaultErrorHandler)
 

@@ -1,7 +1,8 @@
 import { Router } from "express"
-import { staticFileController } from "~/controllers/statics.controllers"
+import { staticImageController, staticVideoController } from "~/controllers/statics.controllers"
 const staticsRouter = Router()
 
-staticsRouter.get("/:name", staticFileController)
+staticsRouter.get("/images/:name", staticImageController)
+staticsRouter.get("/videos/:name", staticVideoController)
 
 export default staticsRouter
