@@ -4,6 +4,7 @@ import sharp from "sharp"
 import path from "path"
 import { UPLOAD_DIR } from "~/constants/dir"
 import fs from "fs"
+import { envConfig } from "~/constants/config"
 
 class MediaService {
   async handleUploadSingleImage(req: Request) {
@@ -17,7 +18,7 @@ class MediaService {
 
     // Delete the original file
     fs.unlinkSync(file.filepath)
-    return `/uploads/${newName}.jpeg`
+    return `${envConfig.HOST}/images/${newName}.jpeg`
   }
 }
 

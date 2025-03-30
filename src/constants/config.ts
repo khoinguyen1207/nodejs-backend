@@ -13,6 +13,7 @@ export const envConfig = {
   DB_PASSWORD: process.env.DB_PASSWORD,
   DB_NAME: process.env.DB_NAME,
   PORT: process.env.PORT || 4000,
+  HOST: process.env.HOST,
 
   PASSWORD_SECRET_KEY: process.env.PASSWORD_SECRET_KEY,
   ACCESS_TOKEN_SECRET_KEY: process.env.ACCESS_TOKEN_SECRET_KEY || "",
