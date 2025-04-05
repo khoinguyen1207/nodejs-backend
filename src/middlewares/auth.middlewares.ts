@@ -57,7 +57,7 @@ export const refreshTokenValidator = validate(
               const decoded_refresh_token = await verifyToken({ token: value, secretOrPublicKey: envConfig.REFRESH_TOKEN_SECRET_KEY })
               const refresh_token = await userService.checkRefreshTokenExist(value)
               if (!refresh_token) {
-                throw new UnauthorizedError("Invalid token", { token: "Refresh token does not exist" })
+                throw new UnauthorizedError("Refresh token does not exist")
               }
               req.decoded_refresh_token = decoded_refresh_token
               return true

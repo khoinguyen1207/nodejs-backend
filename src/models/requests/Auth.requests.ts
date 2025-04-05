@@ -29,3 +29,8 @@ export interface GoogleOauthUserInfoRes {
   family_name: string
   picture: string
 }
+
+export interface RefreshTokenReqBody {
+  refresh_token: string
+  user_id: string
+}

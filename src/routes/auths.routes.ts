@@ -1,7 +1,13 @@
 import { Router } from "express"
 const authRouter = Router()
 
-import { loginController, logoutController, oauthController, registerController } from "~/controllers/auths.controllers"
+import {
+  loginController,
+  logoutController,
+  oauthController,
+  refreshTokenController,
+  registerController,
+} from "~/controllers/auths.controllers"
 import { wrapRequestHandler } from "~/utils/error-handler"
 import {
   accessTokenValidator,
@@ -20,5 +26,6 @@ authRouter.post(
 )
 authRouter.post("/logout", accessTokenValidator, refreshTokenValidator, wrapRequestHandler(logoutController))
 authRouter.post("/oauth/google", wrapRequestHandler(oauthController))
+authRouter.post("/refresh-token", refreshTokenValidator, wrapRequestHandler(refreshTokenController))
 
 export default authRouter

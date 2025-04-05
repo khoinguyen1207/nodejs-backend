@@ -1,7 +1,7 @@
 import { envConfig } from "~/constants/config"
 import { signToken } from "~/utils/jwt"
 import { TokenType } from "~/types/enums"
-import { LoginReqBody, RegisterReqBody } from "~/models/requests/Auth.requests"
+import { LoginReqBody, RefreshTokenReqBody, RegisterReqBody } from "~/models/requests/Auth.requests"
 import { ObjectId } from "mongodb"
 import databaseService from "~/services/database.services"
 import User from "~/models/schemas/User.schema"
@@ -101,6 +101,18 @@ class AuthService {
   async logout(refresh_token: string) {
     const result = await databaseService.refresh_tokens.deleteOne({ token: refresh_token })
     return Boolean(result)
+  }
+
+  async refreshToken({ refresh_token, user_id }: RefreshTokenReqBody) {
+    const [new_access_token, new_refresh_token] = await Promise.all([
+      this.signAccessToken(user_id),
+      this.signRefreshToken(user_id),
+      databaseService.refresh_tokens.deleteOne({ token: refresh_token }),
+    ])
+    const newRefreshToken = new RefreshToken({ user_id: new ObjectId(user_id), token: new_refresh_token })
+    await databaseService.refresh_tokens.insertOne(newRefreshToken)
+
+    return { access_token: new_access_token, refresh_token: new_refresh_token }
   }
 
   // private async getGoogleOauthToken(code: string) {

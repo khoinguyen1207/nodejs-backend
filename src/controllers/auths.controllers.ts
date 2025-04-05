@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 import authService from "~/services/auths.services"
+import { TokenPayload } from "~/types/jwt"
 
 export const loginController = async (req: Request, res: Response) => {
   const { email, password } = req.body
@@ -32,6 +33,19 @@ export const oauthController = async (req: Request, res: Response, next: NextFun
   const result = await authService.oauthGoogle(code as string)
   res.json({
     message: "Login successful!",
+    data: result,
+  })
+}
+
+export const refreshTokenController = async (req: Request, res: Response, next: NextFunction) => {
+  const { refresh_token } = req.body
+  const { user_id } = req.decoded_refresh_token as TokenPayload
+  const result = await authService.refreshToken({
+    refresh_token,
+    user_id,
+  })
+  res.json({
+    message: "Refresh token successful!",
     data: result,
   })
 }

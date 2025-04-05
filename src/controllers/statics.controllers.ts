@@ -21,14 +21,17 @@ export const staticVideoController = async (req: Request, res: Response, next: N
   const { name } = req.params
   const range = req.headers.range
   if (!range) {
-    return res.status(400).send("Request requires Range header")
+    return res.status(400).send("Request requires range header")
   }
   const videoPath = path.resolve(UPLOAD_VIDEO_DIR, name)
   const videoSize = fs.statSync(videoPath).size
+
   const mime = await import("mime")
   const contentType = mime.default.getType(videoPath) || "video/mp4"
-  const chunkSize = 10 ** 6 // 2MB
+
+  const chunkSize = 10 ** 6 * 2 // 2MB
   const start = Number(range.replace(/\D/g, ""))
+
   const end = Math.min(start + chunkSize, videoSize - 1)
   const contentLength = end - start + 1
 
