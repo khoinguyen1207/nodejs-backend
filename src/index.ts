@@ -24,7 +24,7 @@ app.use("/users", usersRouter)
 app.use("/auths", authsRouter)
 app.use("/medias", mediasRouter)
 app.use("/statics", staticsRouter)
-// app.use("/images", express.static(UPLOAD_DIR))
+// app.use("/statics/videos", express.static(UPLOAD_VIDEO_DIR))
 
 app.use(defaultErrorHandler)
 
