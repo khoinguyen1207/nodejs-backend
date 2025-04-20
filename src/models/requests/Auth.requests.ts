@@ -33,4 +33,5 @@ export interface GoogleOauthUserInfoRes {
 export interface RefreshTokenReqBody {
   refresh_token: string
   user_id: string
+  exp: number
 }

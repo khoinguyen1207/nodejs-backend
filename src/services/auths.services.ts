@@ -25,15 +25,16 @@ class AuthService {
     })
   }
 
-  async signRefreshToken(user_id: string) {
+  async signRefreshToken(user_id: string, exp?: number) {
     return signToken({
       payload: {
         user_id,
         token_type: TokenType.RefreshToken,
+        ...(exp ? { exp } : {}),
       },
       secretOrPublicKey: envConfig.REFRESH_TOKEN_SECRET_KEY,
       options: {
-        expiresIn: envConfig.REFRESH_TOKEN_EXPIRES_IN,
+        ...(exp ? {} : { expiresIn: envConfig.REFRESH_TOKEN_EXPIRES_IN }),
       },
     })
   }
@@ -103,10 +104,10 @@ class AuthService {
     return Boolean(result)
   }
 
-  async refreshToken({ refresh_token, user_id }: RefreshTokenReqBody) {
+  async refreshToken({ refresh_token, user_id, exp }: RefreshTokenReqBody) {
     const [new_access_token, new_refresh_token] = await Promise.all([
       this.signAccessToken(user_id),
-      this.signRefreshToken(user_id),
+      this.signRefreshToken(user_id, exp),
       databaseService.refresh_tokens.deleteOne({ token: refresh_token }),
     ])
     const newRefreshToken = new RefreshToken({ user_id: new ObjectId(user_id), token: new_refresh_token })

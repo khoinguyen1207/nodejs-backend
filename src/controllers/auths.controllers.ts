@@ -39,10 +39,11 @@ export const oauthController = async (req: Request, res: Response, next: NextFun
 
 export const refreshTokenController = async (req: Request, res: Response, next: NextFunction) => {
   const { refresh_token } = req.body
-  const { user_id } = req.decoded_refresh_token as TokenPayload
+  const { user_id, exp } = req.decoded_refresh_token as TokenPayload
   const result = await authService.refreshToken({
     refresh_token,
     user_id,
+    exp,
   })
   res.json({
     message: "Refresh token successful!",
