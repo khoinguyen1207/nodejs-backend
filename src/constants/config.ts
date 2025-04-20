@@ -1,5 +1,6 @@
 import dotenv from "dotenv"
 import argv from "minimist"
+import z from "zod"
 dotenv.config()
 
 const commandArgs = argv(process.argv.slice(2))
@@ -8,23 +9,32 @@ export const isEnvProduction = () => {
   return Boolean(commandArgs.production)
 }
 
-export const envConfig = {
-  DB_USERNAME: process.env.DB_USERNAME,
-  DB_PASSWORD: process.env.DB_PASSWORD,
-  DB_NAME: process.env.DB_NAME,
-  PORT: process.env.PORT || 4000,
-  HOST: process.env.HOST,
+const envSchema = z.object({
+  DB_USERNAME: z.string().min(1),
+  DB_PASSWORD: z.string().min(1),
+  DB_NAME: z.string().min(1),
+  PORT: z.string().default("4000"),
+  HOST: z.string().min(1),
 
-  PASSWORD_SECRET_KEY: process.env.PASSWORD_SECRET_KEY,
-  ACCESS_TOKEN_SECRET_KEY: process.env.ACCESS_TOKEN_SECRET_KEY || "",
-  REFRESH_TOKEN_SECRET_KEY: process.env.REFRESH_TOKEN_SECRET_KEY || "",
-  EMAIL_VERIFICATION_SECRET_KEY: process.env.EMAIL_VERIFICATION_SECRET_KEY || "",
-  FORGOT_PASSWORD_SECRET_KEY: process.env.FORGOT_PASSWORD_SECRET_KEY || "",
+  PASSWORD_SECRET_KEY: z.string().min(1),
+  ACCESS_TOKEN_SECRET_KEY: z.string().min(1),
+  REFRESH_TOKEN_SECRET_KEY: z.string().min(1),
+  EMAIL_VERIFICATION_SECRET_KEY: z.string().min(1),
+  FORGOT_PASSWORD_SECRET_KEY: z.string().min(1),
 
-  ACCESS_TOKEN_EXPIRES_IN: process.env.ACCESS_TOKEN_EXPIRES_IN,
-  REFRESH_TOKEN_EXPIRES_IN: process.env.REFRESH_TOKEN_EXPIRES_IN,
+  ACCESS_TOKEN_EXPIRES_IN: z.string().min(1),
+  REFRESH_TOKEN_EXPIRES_IN: z.string().min(1),
 
-  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
-  GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI,
+  GOOGLE_CLIENT_ID: z.string().min(1),
+  GOOGLE_CLIENT_SECRET: z.string().min(1),
+  GOOGLE_REDIRECT_URI: z.string().min(1),
+})
+
+const envValidationResult = envSchema.safeParse(process.env)
+
+if (!envValidationResult.success) {
+  console.error("Invalid environment variables:", envValidationResult.error.format())
+  process.exit(1)
 }
+
+export const envConfig = envValidationResult.data
