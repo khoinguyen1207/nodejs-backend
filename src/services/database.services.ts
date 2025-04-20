@@ -9,10 +9,12 @@ const uri = `mongodb+srv://${envConfig.DB_USERNAME}:${envConfig.DB_PASSWORD}@twi
 class DatabaseService {
   private client: MongoClient
   private db: Db
+
   constructor() {
     this.client = new MongoClient(uri)
     this.db = this.client.db(envConfig.DB_NAME)
   }
+
   async connect() {
     try {
       // Connect the client to the server	(optional starting in v4.7)
@@ -25,6 +27,13 @@ class DatabaseService {
       await this.client.close()
     }
   }
+
+  indexUser() {
+    this.users.createIndex({ email: 1, password: 1 })
+    this.users.createIndex({ email: 1 }, { unique: true })
+    this.users.createIndex({ username: 1 }, { unique: true })
+  }
+
   get users(): Collection<User> {
     return this.db.collection("users")
   }

@@ -15,7 +15,9 @@ const app = express()
 const port = envConfig.PORT
 
 initUploadsFolder()
-databaseService.connect()
+databaseService.connect().then(() => {
+  databaseService.indexUser()
+})
 app.use(express.json())
 app.use(cors())
 
