@@ -1,13 +1,6 @@
 import dotenv from "dotenv"
-import argv from "minimist"
 import z from "zod"
 dotenv.config()
-
-const commandArgs = argv(process.argv.slice(2))
-
-export const isEnvProduction = () => {
-  return Boolean(commandArgs.production)
-}
 
 const envSchema = z.object({
   DB_USERNAME: z.string().min(1),
@@ -15,6 +8,7 @@ const envSchema = z.object({
   DB_NAME: z.string().min(1),
   PORT: z.string().default("4000"),
   HOST: z.string().min(1),
+  NODE_ENV: z.enum(["development", "production"]).default("development"),
 
   PASSWORD_SECRET_KEY: z.string().min(1),
   ACCESS_TOKEN_SECRET_KEY: z.string().min(1),
@@ -38,3 +32,13 @@ if (!envValidationResult.success) {
 }
 
 export const envConfig = envValidationResult.data
+
+export const isEnvProduction = () => {
+  return envConfig.NODE_ENV === "production"
+}
+
+// const commandArgs = argv(process.argv.slice(2))
+
+// export const isEnvProduction = () => {
+//   return Boolean(commandArgs.production)
+// }
