@@ -17,6 +17,8 @@ const port = envConfig.PORT
 initUploadsFolder()
 databaseService.connect().then(() => {
   databaseService.indexUser()
+  databaseService.indexRefreshToken()
+  databaseService.indexFollower()
 })
 app.use(express.json())
 app.use(cors())
