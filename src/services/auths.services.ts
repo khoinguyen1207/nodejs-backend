@@ -10,6 +10,7 @@ import RefreshToken from "~/models/schemas/RefreshToken.schema"
 import { BadRequestError, UnprocessableEntityError } from "~/utils/error-handler"
 import { client } from "~/utils/oauth"
 import { capitalize } from "lodash"
+import { logger } from "~/constants/logging"
 
 class AuthService {
   async signAccessToken(user_id: string) {
@@ -96,6 +97,7 @@ class AuthService {
     ])
     const newRefreshToken = new RefreshToken({ user_id: user._id, token: refresh_token })
     await databaseService.refresh_tokens.insertOne(newRefreshToken)
+    logger.info("Login successful", { user_id: user._id.toString() })
     return { access_token, refresh_token }
   }
 

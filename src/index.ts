@@ -10,10 +10,12 @@ import authsRouter from "~/routes/auths.routes"
 import mediasRouter from "~/routes/medias.routes"
 import databaseService from "~/services/database.services"
 import staticsRouter from "~/routes/statics.routes"
+import { initLogging } from "~/constants/logging"
 
 const app = express()
 const port = envConfig.PORT
 
+initLogging()
 initUploadsFolder()
 databaseService.connect().then(() => {
   databaseService.indexUser()
