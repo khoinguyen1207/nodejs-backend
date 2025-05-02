@@ -10,6 +10,7 @@ import mediasRouter from "~/routes/medias.routes"
 import databaseService from "~/services/database.services"
 import staticsRouter from "~/routes/statics.routes"
 import { initLogging } from "~/constants/logging"
+import tweetsRouter from "~/routes/tweets.routes"
 
 const app = express()
 const port = envConfig.PORT
@@ -29,6 +30,7 @@ app.use("/users", usersRouter)
 app.use("/auths", authsRouter)
 app.use("/medias", mediasRouter)
 app.use("/statics", staticsRouter)
+app.use("/tweets", tweetsRouter)
 // app.use("/statics/videos", express.static(UPLOAD_VIDEO_DIR))
 
 app.use(defaultErrorHandler)
