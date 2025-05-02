@@ -1,7 +1,7 @@
 export enum UserVerifyStatus {
-  Unverified, // chưa xác thực email, mặc định = 0
-  Verified, // đã xác thực email
-  Banned, // bị khóa
+  Unverified,
+  Verified,
+  Banned,
 }
 
 export enum TokenType {
@@ -16,4 +16,21 @@ export enum ErrorCodes {
   BAD_REQUEST = "BAD_REQUEST",
   UNAUTHORIZED = "UNAUTHORIZED",
   UNPROCESSABLE_ENTITY = "UNPROCESSABLE_ENTITY",
+}
+
+export enum MediaType {
+  IMAGE,
+  VIDEO,
+}
+
+export enum TweetAudience {
+  Everyone,
+  TwitterCircle,
+}
+
+export enum TweetType {
+  Tweet,
+  Retweet,
+  Comment,
+  QuoteTweet,
 }

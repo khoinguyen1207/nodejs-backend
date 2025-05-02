@@ -3,7 +3,6 @@ import cors from "cors"
 import { defaultErrorHandler } from "~/middlewares/error.middlewares"
 import { envConfig } from "~/constants/config"
 import { initUploadsFolder } from "~/utils/file"
-// import { UPLOAD_DIR } from "~/constants/dir"
 
 import usersRouter from "~/routes/users.routes"
 import authsRouter from "~/routes/auths.routes"

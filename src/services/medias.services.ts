@@ -5,7 +5,7 @@ import { getNameWithoutExtension, handleUploadImage, handleUploadVideo } from "~
 import { Request } from "express"
 import { UPLOAD_IMAGE_DIR } from "~/constants/dir"
 import { envConfig } from "~/constants/config"
-import { MediaType } from "~/types/medias"
+import { MediaType } from "~/types/enums"
 
 class MediaService {
   async handleUploadImages(req: Request) {
