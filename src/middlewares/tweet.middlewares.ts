@@ -1,19 +1,9 @@
 import { checkSchema } from "express-validator"
-import { has, isEmpty } from "lodash"
+import { isEmpty } from "lodash"
 import { ObjectId } from "mongodb"
 import { MediaType, TweetAudience, TweetType } from "~/types/enums"
 import { numberEnumToArray } from "~/utils/helper"
 import { validate } from "~/utils/validation"
-
-// interface TweetRequestBody {
-//   type: TweetType
-//   audience: TweetAudience
-//   content: string
-//   parent_id: null | string //  chỉ null khi tweet gốc, không thì là tweet_id cha dạng string
-//   hashtags: string[] // tên của hashtag dạng ['javascript', 'reactjs']
-//   mentions: string[] // user_id[]
-//   medias: Media[]
-// }
 
 const enumTypes = numberEnumToArray(TweetType)
 const enumAudiences = numberEnumToArray(TweetAudience)
@@ -53,6 +43,7 @@ export const createTweetValidator = validate(
             if ([TweetType.Retweet].includes(req.body.type) && value) {
               throw new Error("Retweet must not have content")
             }
+            return true
           },
         },
       },
@@ -65,6 +56,7 @@ export const createTweetValidator = validate(
             if (TweetType.Tweet === req.body.type && value !== null) {
               throw new Error("Parent id must be null")
             }
+            return true
           },
         },
       },
@@ -83,7 +75,7 @@ export const createTweetValidator = validate(
         isArray: true,
         custom: {
           options: (value) => {
-            if (!value.every((item: any) => ObjectId.isValid(item))) {
+            if (!value.every((item: any) => typeof item === "string" && ObjectId.isValid(item))) {
               throw new Error("Mentions must be an array of user ids")
             }
             return true

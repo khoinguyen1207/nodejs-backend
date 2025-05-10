@@ -3,6 +3,7 @@ import User from "~/models/schemas/User.schema"
 import { envConfig } from "~/constants/config"
 import RefreshToken from "~/models/schemas/RefreshToken.schema"
 import Follower from "~/models/schemas/Follower.schema"
+import Tweet from "~/models/schemas/Tweet.schema"
 
 const uri = `mongodb+srv://${envConfig.DB_USERNAME}:${envConfig.DB_PASSWORD}@twitter.rguyisz.mongodb.net/?retryWrites=true&w=majority&appName=Twitter`
 
@@ -49,6 +50,10 @@ class DatabaseService {
     if (!indexesExist) {
       this.followers.createIndex({ user_id: 1, followed_user_id: 1 })
     }
+  }
+
+  get tweets(): Collection<Tweet> {
+    return this.db.collection("tweets")
   }
 
   get users(): Collection<User> {
