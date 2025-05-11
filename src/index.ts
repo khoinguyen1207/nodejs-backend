@@ -11,6 +11,7 @@ import databaseService from "~/services/database.services"
 import staticsRouter from "~/routes/statics.routes"
 import { initLogging } from "~/constants/logging"
 import tweetsRouter from "~/routes/tweets.routes"
+import logRequest from "~/middlewares/logging.middlewares"
 
 const app = express()
 const port = envConfig.PORT
@@ -24,6 +25,7 @@ databaseService.connect().then(() => {
 })
 app.use(express.json())
 app.use(cors())
+app.use(logRequest)
 
 // Routes
 app.use("/users", usersRouter)

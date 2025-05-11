@@ -97,7 +97,6 @@ class AuthService {
     ])
     const newRefreshToken = new RefreshToken({ user_id: user._id, token: refresh_token })
     await databaseService.refresh_tokens.insertOne(newRefreshToken)
-    logger.info("Login successful", { user_id: user._id.toString() })
     return { access_token, refresh_token }
   }
 

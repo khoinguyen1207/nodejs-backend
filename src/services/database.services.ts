@@ -4,6 +4,7 @@ import { envConfig } from "~/constants/config"
 import RefreshToken from "~/models/schemas/RefreshToken.schema"
 import Follower from "~/models/schemas/Follower.schema"
 import Tweet from "~/models/schemas/Tweet.schema"
+import Hashtag from "~/models/schemas/Hashtag.schema"
 
 const uri = `mongodb+srv://${envConfig.DB_USERNAME}:${envConfig.DB_PASSWORD}@twitter.rguyisz.mongodb.net/?retryWrites=true&w=majority&appName=Twitter`
 
@@ -52,10 +53,6 @@ class DatabaseService {
     }
   }
 
-  get tweets(): Collection<Tweet> {
-    return this.db.collection("tweets")
-  }
-
   get users(): Collection<User> {
     return this.db.collection("users")
   }
@@ -66,6 +63,14 @@ class DatabaseService {
 
   get followers(): Collection<Follower> {
     return this.db.collection("followers")
+  }
+
+  get tweets(): Collection<Tweet> {
+    return this.db.collection("tweets")
+  }
+
+  get hashtags(): Collection<Hashtag> {
+    return this.db.collection("hashtags")
   }
 }
 

@@ -21,7 +21,6 @@ class UserService {
     return user
   }
 
-  // Check refresh token exist
   async checkRefreshTokenExist(refresh_token: string) {
     const result = await databaseService.refresh_tokens.findOne({ token: refresh_token })
     return Boolean(result)
