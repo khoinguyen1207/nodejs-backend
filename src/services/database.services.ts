@@ -5,6 +5,7 @@ import RefreshToken from "~/models/schemas/RefreshToken.schema"
 import Follower from "~/models/schemas/Follower.schema"
 import Tweet from "~/models/schemas/Tweet.schema"
 import Hashtag from "~/models/schemas/Hashtag.schema"
+import Bookmark from "~/models/schemas/Bookmark.schema"
 
 const uri = `mongodb+srv://${envConfig.DB_USERNAME}:${envConfig.DB_PASSWORD}@twitter.rguyisz.mongodb.net/?retryWrites=true&w=majority&appName=Twitter`
 
@@ -71,6 +72,10 @@ class DatabaseService {
 
   get hashtags(): Collection<Hashtag> {
     return this.db.collection("hashtags")
+  }
+
+  get bookmarks(): Collection<Bookmark> {
+    return this.db.collection("bookmarks")
   }
 }
 

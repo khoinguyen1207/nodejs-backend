@@ -3,14 +3,16 @@ import cors from "cors"
 import { defaultErrorHandler } from "~/middlewares/error.middlewares"
 import { envConfig } from "~/constants/config"
 import { initUploadsFolder } from "~/utils/file"
+import { initLogging } from "~/constants/logging"
 
 import usersRouter from "~/routes/users.routes"
 import authsRouter from "~/routes/auths.routes"
 import mediasRouter from "~/routes/medias.routes"
-import databaseService from "~/services/database.services"
+import bookmarksRouter from "~/routes/bookmarks.routes"
 import staticsRouter from "~/routes/statics.routes"
-import { initLogging } from "~/constants/logging"
 import tweetsRouter from "~/routes/tweets.routes"
+
+import databaseService from "~/services/database.services"
 import logRequest from "~/middlewares/logging.middlewares"
 
 const app = express()
@@ -33,6 +35,7 @@ app.use("/auths", authsRouter)
 app.use("/medias", mediasRouter)
 app.use("/statics", staticsRouter)
 app.use("/tweets", tweetsRouter)
+app.use("/bookmarks", bookmarksRouter)
 // app.use("/statics/videos", express.static(UPLOAD_VIDEO_DIR))
 
 app.use(defaultErrorHandler)
