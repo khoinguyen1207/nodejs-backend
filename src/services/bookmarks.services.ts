@@ -34,6 +34,23 @@ class BookmarkService {
     )
     return result
   }
+
+  async unBookmarkTweet(user_id: string, tweet_id: string) {
+    if (!ObjectId.isValid(tweet_id)) {
+      throw new UnprocessableEntityError("Invalid tweet ID")
+    }
+
+    const result = await databaseService.bookmarks.findOneAndDelete({
+      user_id: new ObjectId(user_id),
+      tweet_id: new ObjectId(tweet_id),
+    })
+
+    if (!result) {
+      throw new NotFoundError("Bookmark not found")
+    }
+
+    return true
+  }
 }
 
 const bookmarkService = new BookmarkService()
