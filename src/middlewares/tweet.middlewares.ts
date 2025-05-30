@@ -1,7 +1,9 @@
 import { checkSchema } from "express-validator"
 import { isEmpty } from "lodash"
 import { ObjectId } from "mongodb"
+import databaseService from "~/services/database.services"
 import { MediaType, TweetAudience, TweetType } from "~/types/enums"
+import { NotFoundError } from "~/utils/error-handler"
 import { numberEnumToArray } from "~/utils/helper"
 import { validate } from "~/utils/validation"
 
@@ -100,4 +102,25 @@ export const createTweetValidator = validate(
     },
     ["body"],
   ),
+)
+
+export const tweetIdValidator = validate(
+  checkSchema({
+    tweet_id: {
+      isMongoId: {
+        errorMessage: "Tweet id is invalid",
+      },
+      custom: {
+        options: async (value: string) => {
+          const tweet = await databaseService.tweets.findOne({
+            _id: new ObjectId(value),
+          })
+          if (!tweet) {
+            throw new NotFoundError("Tweet ID not found")
+          }
+          return true
+        },
+      },
+    },
+  }),
 )

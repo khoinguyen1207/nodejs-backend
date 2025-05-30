@@ -6,7 +6,7 @@ export const bookmarksTweetController = async (req: Request, res: Response, next
   const { user_id } = req.decoded_authorization as TokenPayload
   const result = await bookmarkService.bookmarkTweet(user_id, req.body.tweet_id)
   res.json({
-    message: "Create tweet successfully",
+    message: "Bookmark tweet successfully",
     data: result,
   })
 }
