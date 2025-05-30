@@ -1,9 +1,11 @@
+import { NextFunction, Request, Response } from "express"
 import { checkSchema } from "express-validator"
 import { isEmpty } from "lodash"
 import { ObjectId } from "mongodb"
+import Tweet from "~/models/schemas/Tweet.schema"
 import databaseService from "~/services/database.services"
-import { MediaType, TweetAudience, TweetType } from "~/types/enums"
-import { NotFoundError } from "~/utils/error-handler"
+import { MediaType, TweetAudience, TweetType, UserVerifyStatus } from "~/types/enums"
+import { BadRequestError, NotFoundError, UnauthorizedError } from "~/utils/error-handler"
 import { numberEnumToArray } from "~/utils/helper"
 import { validate } from "~/utils/validation"
 
@@ -111,16 +113,43 @@ export const tweetIdValidator = validate(
         errorMessage: "Tweet id is invalid",
       },
       custom: {
-        options: async (value: string) => {
+        options: async (value: string, { req }) => {
           const tweet = await databaseService.tweets.findOne({
             _id: new ObjectId(value),
           })
           if (!tweet) {
             throw new NotFoundError("Tweet ID not found")
           }
+          req.tweet = tweet
           return true
         },
       },
     },
   }),
 )
+
+export const audienceValidator = async (req: Request, res: Response, next: NextFunction) => {
+  const tweet = req.tweet as Tweet
+  if (tweet.audience === TweetAudience.TwitterCircle) {
+    // Check if the user is not logged in
+    if (!req.decoded_authorization) {
+      throw new UnauthorizedError("You must be logged in to view this tweet")
+    }
+
+    const author = await databaseService.users.findOne({
+      _id: tweet.user_id,
+    })
+
+    // Check if user is not found or banned
+    if (!author || author.verify === UserVerifyStatus.Banned) {
+      throw new NotFoundError("User not found or banned")
+    }
+
+    const { user_id } = req.decoded_authorization
+    const isInTwitterCircle = author.twitter_circle.some((item) => item.equals(user_id))
+    if (!isInTwitterCircle && !author._id.equals(user_id)) {
+      throw new BadRequestError("Tweet is not public")
+    }
+  }
+  next()
+}
