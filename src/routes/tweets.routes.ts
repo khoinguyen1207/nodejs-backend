@@ -1,5 +1,10 @@
 import { Router } from "express"
-import { createTweetController, getTweetDetailController } from "~/controllers/tweets.controllers"
+import {
+  createTweetController,
+  getTweetDetailController,
+  likeTweetController,
+  unLikeTweetController,
+} from "~/controllers/tweets.controllers"
 import { accessTokenValidator, isUserLoggedInValidator, verifiedUserValidator } from "~/middlewares/auth.middlewares"
 import { audienceValidator, createTweetValidator, tweetIdValidator } from "~/middlewares/tweet.middlewares"
 import { wrapRequestHandler } from "~/utils/error-handler"
@@ -13,6 +18,14 @@ tweetsRouter.get(
   isUserLoggedInValidator(verifiedUserValidator),
   wrapRequestHandler(audienceValidator),
   wrapRequestHandler(getTweetDetailController),
+)
+tweetsRouter.post("/like", accessTokenValidator, verifiedUserValidator, tweetIdValidator, wrapRequestHandler(likeTweetController))
+tweetsRouter.delete(
+  "/unlike/:tweet_id",
+  accessTokenValidator,
+  verifiedUserValidator,
+  tweetIdValidator,
+  wrapRequestHandler(unLikeTweetController),
 )
 
 export default tweetsRouter
