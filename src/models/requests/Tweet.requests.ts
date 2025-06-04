@@ -16,4 +16,5 @@ export interface GetTweetChildrenPayload {
   tweet_type: TweetType
   page: number
   limit: number
+  user_id?: string
 }

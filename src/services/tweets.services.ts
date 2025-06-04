@@ -179,7 +179,7 @@ class TweetService {
     return tweets[0]
   }
 
-  async getTweetChildren({ tweet_id, tweet_type, page, limit }: GetTweetChildrenPayload) {
+  async getTweetChildren({ tweet_id, tweet_type, page, limit, user_id }: GetTweetChildrenPayload) {
     const tweets = await databaseService.tweets
       .aggregate<Tweet>([
         {
@@ -297,10 +297,24 @@ class TweetService {
       ])
       .toArray()
 
-    const totalTweets = await databaseService.tweets.countDocuments({
-      parent_id: new ObjectId(tweet_id),
-      type: tweet_type,
-    })
+    const tweet_ids = tweets.map((item) => item._id as ObjectId)
+    const [, totalTweets] = await Promise.all([
+      databaseService.tweets.updateMany(
+        {
+          _id: {
+            $in: tweet_ids,
+          },
+        },
+        {
+          $inc: user_id ? { user_views: 1 } : { guest_views: 1 },
+        },
+      ),
+      await databaseService.tweets.countDocuments({
+        parent_id: new ObjectId(tweet_id),
+        type: tweet_type,
+      }),
+    ])
+
     return { tweets, totalTweets }
   }
 
