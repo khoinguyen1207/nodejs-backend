@@ -1,6 +1,7 @@
 import { Router } from "express"
 import {
   createTweetController,
+  getTweetChildrenController,
   getTweetDetailController,
   likeTweetController,
   unLikeTweetController,
@@ -19,6 +20,16 @@ tweetsRouter.get(
   wrapRequestHandler(audienceValidator),
   wrapRequestHandler(getTweetDetailController),
 )
+tweetsRouter.get(
+  "/children/:tweet_id",
+  tweetIdValidator,
+  isUserLoggedInValidator(accessTokenValidator),
+  isUserLoggedInValidator(verifiedUserValidator),
+  wrapRequestHandler(audienceValidator),
+  wrapRequestHandler(getTweetChildrenController),
+)
+
+// Like
 tweetsRouter.post("/like", accessTokenValidator, verifiedUserValidator, tweetIdValidator, wrapRequestHandler(likeTweetController))
 tweetsRouter.delete(
   "/unlike/:tweet_id",

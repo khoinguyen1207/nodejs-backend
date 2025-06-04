@@ -10,3 +10,10 @@ export interface CreateTweetReqBody {
   mentions: string[]
   medias: Media[]
 }
+
+export interface GetTweetChildrenPayload {
+  tweet_id: string
+  tweet_type: TweetType
+  page: number
+  limit: number
+}
