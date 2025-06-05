@@ -309,11 +309,18 @@ class TweetService {
           $inc: user_id ? { user_views: 1 } : { guest_views: 1 },
         },
       ),
-      await databaseService.tweets.countDocuments({
+      databaseService.tweets.countDocuments({
         parent_id: new ObjectId(tweet_id),
         type: tweet_type,
       }),
     ])
+    tweets.forEach((item) => {
+      if (user_id) {
+        item.user_views += 1
+      } else {
+        item.guest_views += 1
+      }
+    })
 
     return { tweets, totalTweets }
   }

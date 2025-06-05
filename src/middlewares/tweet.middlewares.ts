@@ -153,3 +153,36 @@ export const audienceValidator = async (req: Request, res: Response, next: NextF
   }
   next()
 }
+
+export const getTweetChildrenValidator = validate(
+  checkSchema({
+    tweet_type: {
+      isIn: {
+        options: [enumTypes],
+        errorMessage: "Tweet type is invalid",
+      },
+    },
+    limit: {
+      isInt: true,
+      custom: {
+        options: (value) => {
+          if (Number(value) > 100 || Number(value) < 1) {
+            throw new Error("Limit <= 100 and >= 1")
+          }
+          return true
+        },
+      },
+    },
+    page: {
+      isInt: true,
+      custom: {
+        options: (value) => {
+          if (Number(value) < 1) {
+            throw new Error("Page >= 1")
+          }
+          return true
+        },
+      },
+    },
+  }),
+)
