@@ -30,14 +30,15 @@ class TweetService {
     return hashtagDocuments.map((hashtagDoc) => (hashtagDoc as WithId<Hashtag>)._id)
   }
 
-  async increaseViews(tweet_id: string, user_id?: string) {
-    const inc = user_id ? { user_views: 1 } : { guest_views: 1 }
-    await databaseService.tweets.updateOne(
+  async increaseViews(tweet_ids: ObjectId[], user_id?: string) {
+    return await databaseService.tweets.updateMany(
       {
-        _id: new ObjectId(tweet_id),
+        _id: {
+          $in: tweet_ids,
+        },
       },
       {
-        $inc: inc,
+        $inc: user_id ? { user_views: 1 } : { guest_views: 1 },
         $currentDate: {
           updated_at: true,
         },
@@ -65,7 +66,8 @@ class TweetService {
     return tweet
   }
 
-  async getTweetDetail(tweet_id: string) {
+  async getTweetDetail(tweet_id: string, user_id?: string) {
+    await this.increaseViews([new ObjectId(tweet_id)], user_id)
     const tweets = await databaseService.tweets
       .aggregate<Tweet>([
         {
@@ -298,22 +300,13 @@ class TweetService {
       .toArray()
 
     const tweet_ids = tweets.map((item) => item._id as ObjectId)
-    const [_, totalTweets] = await Promise.all([
-      databaseService.tweets.updateMany(
-        {
-          _id: {
-            $in: tweet_ids,
-          },
-        },
-        {
-          $inc: user_id ? { user_views: 1 } : { guest_views: 1 },
-        },
-      ),
-      databaseService.tweets.countDocuments({
-        parent_id: new ObjectId(tweet_id),
-        type: tweet_type,
-      }),
-    ])
+    const getTotalTweets = databaseService.tweets.countDocuments({
+      parent_id: new ObjectId(tweet_id),
+      type: tweet_type,
+    })
+
+    const [_, totalTweets] = await Promise.all([this.increaseViews(tweet_ids, user_id), getTotalTweets])
+
     tweets.forEach((item) => {
       if (user_id) {
         item.user_views += 1
@@ -340,11 +333,10 @@ class TweetService {
         },
       )
       .toArray()
-
     const followed_user_ids_array = followed_user_ids.map((item) => item.followed_user_id)
     followed_user_ids_array.push(userObjectId) // Include the user themselves
 
-    const [tweets, totalTweets] = await Promise.all([
+    const [tweets, total_tweets] = await Promise.all([
       databaseService.tweets
         .aggregate([
           {
@@ -503,49 +495,66 @@ class TweetService {
           },
         ])
         .toArray(),
-      databaseService.tweets.aggregate([
-        {
-          $match: {
-            user_id: {
-              $in: followed_user_ids_array,
+      databaseService.tweets
+        .aggregate([
+          {
+            $match: {
+              user_id: {
+                $in: followed_user_ids_array,
+              },
             },
           },
-        },
-        {
-          $lookup: {
-            from: "users",
-            localField: "user_id",
-            foreignField: "_id",
-            as: "user",
+          {
+            $lookup: {
+              from: "users",
+              localField: "user_id",
+              foreignField: "_id",
+              as: "user",
+            },
           },
-        },
-        {
-          $match: {
-            $or: [
-              {
-                audience: TweetAudience.Everyone,
-              },
-              {
-                $and: [
-                  {
-                    audience: TweetAudience.TwitterCircle,
-                  },
-                  {
-                    "user.twitter_circle": {
-                      $in: [userObjectId],
+          {
+            $unwind: {
+              path: "$user",
+            },
+          },
+          {
+            $match: {
+              $or: [
+                {
+                  audience: TweetAudience.Everyone,
+                },
+                {
+                  $and: [
+                    {
+                      audience: TweetAudience.TwitterCircle,
                     },
-                  },
-                ],
-              },
-            ],
+                    {
+                      "user.twitter_circle": {
+                        $in: [userObjectId],
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
           },
-        },
-        {
-          $count: "totalTweets",
-        },
-      ]),
+          {
+            $count: "total_tweets",
+          },
+        ])
+        .toArray(),
     ])
-    return { tweets, totalTweets }
+
+    // Get the tweet IDs
+    const tweet_ids = tweets.map((item) => item._id as ObjectId)
+
+    // Increase views for the tweets
+    await this.increaseViews(tweet_ids, user_id)
+    tweets.forEach((item) => {
+      item.user_views += 1
+    })
+
+    return { tweets, total_tweets: total_tweets[0].total_tweets || 0 }
   }
 
   async likeTweet(user_id: string, tweet_id: string) {

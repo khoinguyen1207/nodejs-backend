@@ -12,8 +12,8 @@ export const createTweetController = async (req: Request, res: Response, next: N
 }
 
 export const getTweetDetailController = async (req: Request, res: Response, next: NextFunction) => {
-  await tweetService.increaseViews(req.params.tweet_id, req.decoded_authorization?.user_id)
-  const result = await tweetService.getTweetDetail(req.params.tweet_id)
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const result = await tweetService.getTweetDetail(req.params.tweet_id, user_id)
   res.json({
     message: "Get tweet detail successfully",
     data: result,
@@ -23,7 +23,7 @@ export const getTweetDetailController = async (req: Request, res: Response, next
 export const getTweetChildrenController = async (req: Request, res: Response, next: NextFunction) => {
   const tweet_type = Number(req.query.tweet_type)
   const page = Number(req.query.page) || 1
-  const limit = Number(req.query.limit) || 5
+  const limit = Number(req.query.limit) || 10
   const user_id = req.decoded_authorization?.user_id
 
   const { tweets, totalTweets } = await tweetService.getTweetChildren({
@@ -66,16 +66,17 @@ export const unLikeTweetController = async (req: Request, res: Response, next: N
 export const getNewFeedsController = async (req: Request, res: Response, next: NextFunction) => {
   const { user_id } = req.decoded_authorization as TokenPayload
   const page = Number(req.query.page) || 1
-  const limit = Number(req.query.limit) || 5
+  const limit = Number(req.query.limit) || 10
 
-  const result = await tweetService.getNewFeeds(user_id, page, limit)
+  const { tweets, total_tweets } = await tweetService.getNewFeeds(user_id, page, limit)
 
   res.json({
     message: "Get new feeds successfully",
     data: {
-      tweets: result,
+      tweets: tweets,
       page: page,
       limit: limit,
+      total_page: Math.ceil(total_tweets / limit),
     },
   })
 }

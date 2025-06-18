@@ -165,11 +165,13 @@ export const getTweetChildrenValidator = validate(
     limit: {
       custom: {
         options: (value) => {
-          if (value && !Number.isInteger(Number(value))) {
-            throw new Error("Limit must be an integer")
-          }
-          if (Number(value) > 100 || Number(value) < 1) {
-            throw new Error("Limit <= 100 and >= 1")
+          if (value) {
+            if (!Number.isInteger(Number(value))) {
+              throw new Error("Limit must be an integer")
+            }
+            if (Number(value) > 100 || Number(value) < 1) {
+              throw new Error("Limit <= 100 and >= 1")
+            }
           }
           return true
         },
@@ -178,11 +180,13 @@ export const getTweetChildrenValidator = validate(
     page: {
       custom: {
         options: (value) => {
-          if (value && !Number.isInteger(Number(value))) {
-            throw new Error("Page must be an integer")
-          }
-          if (Number(value) < 1) {
-            throw new Error("Page >= 1")
+          if (value) {
+            if (!Number.isInteger(Number(value))) {
+              throw new Error("Page must be an integer")
+            }
+            if (Number(value) < 1) {
+              throw new Error("Page >= 1")
+            }
           }
           return true
         },
