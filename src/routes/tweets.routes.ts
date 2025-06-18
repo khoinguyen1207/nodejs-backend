@@ -1,6 +1,7 @@
 import { Router } from "express"
 import {
   createTweetController,
+  getNewFeedsController,
   getTweetChildrenController,
   getTweetDetailController,
   likeTweetController,
@@ -13,7 +14,7 @@ const tweetsRouter = Router()
 
 tweetsRouter.post("/", accessTokenValidator, verifiedUserValidator, createTweetValidator, wrapRequestHandler(createTweetController))
 tweetsRouter.get(
-  "/:tweet_id",
+  "/detail/:tweet_id",
   tweetIdValidator,
   isUserLoggedInValidator(accessTokenValidator),
   isUserLoggedInValidator(verifiedUserValidator),
@@ -29,6 +30,9 @@ tweetsRouter.get(
   wrapRequestHandler(audienceValidator),
   wrapRequestHandler(getTweetChildrenController),
 )
+
+// New feeds
+tweetsRouter.get("/new-feeds", accessTokenValidator, verifiedUserValidator, wrapRequestHandler(getNewFeedsController))
 
 // Like
 tweetsRouter.post("/like", accessTokenValidator, verifiedUserValidator, tweetIdValidator, wrapRequestHandler(likeTweetController))

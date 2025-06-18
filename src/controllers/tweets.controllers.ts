@@ -62,3 +62,20 @@ export const unLikeTweetController = async (req: Request, res: Response, next: N
     data: true,
   })
 }
+
+export const getNewFeedsController = async (req: Request, res: Response, next: NextFunction) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const page = Number(req.query.page) || 1
+  const limit = Number(req.query.limit) || 5
+
+  const result = await tweetService.getNewFeeds(user_id, page, limit)
+
+  res.json({
+    message: "Get new feeds successfully",
+    data: {
+      tweets: result,
+      page: page,
+      limit: limit,
+    },
+  })
+}
