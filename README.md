@@ -1,4 +1,4 @@
-<h1 align="center">Twitter Backend</h1>
+<h1 align="center">NodeJS Backend</h1>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white"/>
@@ -11,7 +11,7 @@
 
 ✅ **Framework**: Express.js  
 ✅ **Language**: TypeScript  
-✅ **Database**: NoSQL (MongoDB)  
+✅ **Database**: MongoDB  
 ✅ **Authentication**: JWT (access token, refresh token) & OAuth 2.0 (Google)  
 ✅ **Email Service**: AWS SES  
 ✅ **Upload File**: Server storage & AWS S3  
@@ -19,7 +19,6 @@
 ✅ **Streaming**: Node.js Stream & HLS (HTTP Live Streaming)  
 ✅ **Websocket**: Socket.io  
 ✅ **TypeODM**: MongoDB Node.js Driver  
-✅ **Test API**: Postman  
 ✅ **Deployment**: Docker & EC2 (AWS)  
 ✅ **API Documentation**: Swagger
 
