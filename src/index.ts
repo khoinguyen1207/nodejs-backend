@@ -25,6 +25,7 @@ databaseService.connect().then(() => {
   databaseService.indexUser()
   databaseService.indexRefreshToken()
   databaseService.indexFollower()
+  databaseService.indexTweet()
 })
 app.use(express.json())
 app.use(cors())
