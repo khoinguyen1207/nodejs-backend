@@ -23,6 +23,11 @@ export enum MediaType {
   VIDEO,
 }
 
+export enum MediaTypeQuery {
+  IMAGE = "image",
+  VIDEO = "video",
+}
+
 export enum TweetAudience {
   Everyone,
   TwitterCircle,

@@ -1,6 +1,8 @@
 import { Pagination } from "~/models/requests/Util.requests"
+import { MediaTypeQuery } from "~/types/enums"
 
 export interface SearchQuery extends Pagination {
-  content: string
   user_id: string
+  content?: string
+  media_type?: MediaTypeQuery
 }
