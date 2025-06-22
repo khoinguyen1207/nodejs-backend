@@ -11,6 +11,7 @@ import mediasRouter from "~/routes/medias.routes"
 import bookmarksRouter from "~/routes/bookmarks.routes"
 import staticsRouter from "~/routes/statics.routes"
 import tweetsRouter from "~/routes/tweets.routes"
+import searchRouter from "~/routes/searchs.routes"
 
 import databaseService from "~/services/database.services"
 import logRequest from "~/middlewares/logging.middlewares"
@@ -36,6 +37,7 @@ app.use("/medias", mediasRouter)
 app.use("/statics", staticsRouter)
 app.use("/tweets", tweetsRouter)
 app.use("/bookmarks", bookmarksRouter)
+app.use("/searchs", searchRouter)
 // app.use("/statics/videos", express.static(UPLOAD_VIDEO_DIR))
 
 app.use(defaultErrorHandler)
