@@ -5,4 +5,5 @@ export interface SearchQuery extends Pagination {
   user_id: string
   content?: string
   media_type?: MediaTypeQuery
+  people_follow?: boolean
 }

@@ -6,15 +6,12 @@ import { MediaType, MediaTypeQuery, TweetAudience, TweetType } from "~/types/enu
 
 class SearchService {
   async search(query: SearchQuery) {
-    const { content = "", page, limit, user_id, media_type } = query
+    const { content, page, limit, user_id, media_type, people_follow } = query
     const userObjectId = new ObjectId(user_id)
 
-    const filter = {
-      $text: {
-        $search: content,
-      },
-    } as any
+    const filter = {} as any
 
+    // Filter by media type if provided
     if (media_type) {
       if (media_type === MediaTypeQuery.IMAGE) {
         filter["medias.type"] = MediaType.IMAGE
@@ -23,11 +20,26 @@ class SearchService {
       }
     }
 
+    // Filter by followed users if the option is enabled
+    if (people_follow) {
+      const followed_user_ids = await tweetService.getFollowedUserIds(user_id)
+      followed_user_ids.push(userObjectId) // Include the user themselves
+      filter["user_id"] = {
+        $in: followed_user_ids,
+      }
+    }
+
+    // Perform the search query
     const [tweets, total_tweets] = await Promise.all([
       databaseService.tweets
         .aggregate([
           {
-            $match: filter,
+            $match: {
+              $text: {
+                $search: content,
+              },
+              ...filter,
+            },
           },
           {
             $lookup: {
@@ -181,7 +193,12 @@ class SearchService {
       databaseService.tweets
         .aggregate([
           {
-            $match: filter,
+            $match: {
+              $text: {
+                $search: content,
+              },
+              ...filter,
+            },
           },
           {
             $lookup: {
@@ -233,7 +250,7 @@ class SearchService {
       item.user_views += 1
     })
 
-    return { tweets, total_tweets: total_tweets.length > 0 ? total_tweets[0].total_tweets : 0 }
+    return { tweets, total_tweets: total_tweets[0]?.total_tweets || 0 }
   }
 }
 

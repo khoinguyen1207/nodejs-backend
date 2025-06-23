@@ -66,6 +66,24 @@ class TweetService {
     return tweet
   }
 
+  async getFollowedUserIds(user_id: string) {
+    const userObjectId = new ObjectId(user_id)
+    const followedUsers = await databaseService.followers
+      .find(
+        {
+          user_id: userObjectId,
+        },
+        {
+          projection: {
+            followed_user_id: 1,
+            _id: 0,
+          },
+        },
+      )
+      .toArray()
+    return followedUsers.map((item) => item.followed_user_id)
+  }
+
   async getTweetDetail(tweet_id: string, user_id?: string) {
     await this.increaseViews([new ObjectId(tweet_id)], user_id)
     const tweets = await databaseService.tweets
@@ -320,21 +338,8 @@ class TweetService {
 
   async getNewFeeds(user_id: string, page: number, limit: number) {
     const userObjectId = new ObjectId(user_id)
-    const followed_user_ids = await databaseService.followers
-      .find(
-        {
-          user_id: userObjectId,
-        },
-        {
-          projection: {
-            followed_user_id: 1,
-            _id: 0,
-          },
-        },
-      )
-      .toArray()
-    const followed_user_ids_array = followed_user_ids.map((item) => item.followed_user_id)
-    followed_user_ids_array.push(userObjectId) // Include the user themselves
+    const followed_user_ids = await this.getFollowedUserIds(user_id)
+    followed_user_ids.push(userObjectId) // Include the user themselves
 
     const [tweets, total_tweets] = await Promise.all([
       databaseService.tweets
@@ -342,7 +347,7 @@ class TweetService {
           {
             $match: {
               user_id: {
-                $in: followed_user_ids_array,
+                $in: followed_user_ids,
               },
             },
           },
@@ -500,7 +505,7 @@ class TweetService {
           {
             $match: {
               user_id: {
-                $in: followed_user_ids_array,
+                $in: followed_user_ids,
               },
             },
           },

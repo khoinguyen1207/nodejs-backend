@@ -9,8 +9,9 @@ export const searchController = async (req: Request, res: Response, next: NextFu
   const content = (req.query.content as string) || ""
   const { user_id } = req.decoded_authorization as TokenPayload
   const media_type = req.query.media_type as MediaTypeQuery
+  const people_follow = Boolean(req.query.people_follow === "on")
 
-  const { tweets, total_tweets } = await searchService.search({ content, page, limit, user_id, media_type })
+  const { tweets, total_tweets } = await searchService.search({ content, page, limit, user_id, media_type, people_follow })
 
   res.json({
     message: "Search successfully",
