@@ -4,9 +4,9 @@ import { MediaTypeQuery } from "~/types/enums"
 import { TokenPayload } from "~/types/jwt"
 
 export const searchController = async (req: Request, res: Response, next: NextFunction) => {
-  const page = Number(req.query.page || 1)
-  const limit = Number(req.query.limit || 10)
-  const content = (req.query.content as string) || ""
+  const page = Number(req.query.page)
+  const limit = Number(req.query.limit)
+  const content = req.query.content as string
   const { user_id } = req.decoded_authorization as TokenPayload
   const media_type = req.query.media_type as MediaTypeQuery
   const people_follow = Boolean(req.query.people_follow === "on")
