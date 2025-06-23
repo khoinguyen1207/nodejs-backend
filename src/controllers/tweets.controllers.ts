@@ -22,8 +22,8 @@ export const getTweetDetailController = async (req: Request, res: Response, next
 
 export const getTweetChildrenController = async (req: Request, res: Response, next: NextFunction) => {
   const tweet_type = Number(req.query.tweet_type)
-  const page = Number(req.query.page) || 1
-  const limit = Number(req.query.limit) || 10
+  const page = Number(req.query.page)
+  const limit = Number(req.query.limit)
   const user_id = req.decoded_authorization?.user_id
 
   const { tweets, totalTweets } = await tweetService.getTweetChildren({

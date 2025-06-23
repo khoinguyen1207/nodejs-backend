@@ -8,6 +8,7 @@ import {
   unLikeTweetController,
 } from "~/controllers/tweets.controllers"
 import { accessTokenValidator, isUserLoggedInValidator, verifiedUserValidator } from "~/middlewares/auth.middlewares"
+import { paginationValidator } from "~/middlewares/search.middlewares"
 import { audienceValidator, createTweetValidator, getTweetChildrenValidator, tweetIdValidator } from "~/middlewares/tweet.middlewares"
 import { wrapRequestHandler } from "~/utils/error-handler"
 const tweetsRouter = Router()
@@ -28,6 +29,7 @@ tweetsRouter.get(
   isUserLoggedInValidator(accessTokenValidator),
   isUserLoggedInValidator(verifiedUserValidator),
   wrapRequestHandler(audienceValidator),
+  paginationValidator,
   wrapRequestHandler(getTweetChildrenController),
 )
 
