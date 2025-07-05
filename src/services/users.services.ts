@@ -6,6 +6,7 @@ import authService from "~/services/auths.services"
 import databaseService from "~/services/database.services"
 import { hashPassword } from "~/utils/crypto"
 import { BadRequestError, NotFoundError } from "~/utils/error-handler"
+import { sendVerifyEmail } from "~/utils/email"
 
 class UserService {
   async checkEmailExist(email: string) {
@@ -56,7 +57,8 @@ class UserService {
       throw new BadRequestError("Please wait 1 minute before sending another email")
     }
     const email_verify_token = await authService.signEmailVerifyToken(user_id)
-    console.log("send email: ", email_verify_token)
+    await sendVerifyEmail(user.email, email_verify_token)
+    console.log("Sent email verify: ", email_verify_token)
     await databaseService.users.updateOne({ _id: user._id }, { $set: { email_verify_token }, $currentDate: { updated_at: true } })
     return true
   }

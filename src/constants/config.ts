@@ -8,6 +8,7 @@ const envSchema = z.object({
   DB_NAME: z.string().min(1),
   PORT: z.string().default("4000"),
   HOST: z.string().min(1),
+  CLIENT_URL: z.string().min(1).default("http://localhost:3000"),
   NODE_ENV: z.enum(["development", "production"]).default("development"),
 
   PASSWORD_SECRET_KEY: z.string().min(1),
@@ -22,6 +23,11 @@ const envSchema = z.object({
   GOOGLE_CLIENT_ID: z.string().min(1),
   GOOGLE_CLIENT_SECRET: z.string().min(1),
   GOOGLE_REDIRECT_URI: z.string().min(1),
+
+  AWS_ACCESS_KEY_ID: z.string().min(1),
+  AWS_SECRET_ACCESS_KEY: z.string().min(1),
+  AWS_REGION: z.string().min(1).default("ap-southeast-1"),
+  SES_FROM_ADDRESS: z.string().email().min(1),
 })
 
 const envValidationResult = envSchema.safeParse(process.env)
