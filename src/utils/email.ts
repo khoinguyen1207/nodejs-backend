@@ -59,12 +59,7 @@ export const sendEmail = async (toAddress: string, subject: string, body: string
     subject,
   })
 
-  try {
-    return await sesClient.send(sendEmailCommand)
-  } catch (e) {
-    console.error("Failed to send email.")
-    return e
-  }
+  return await sesClient.send(sendEmailCommand)
 }
 
 export const sendVerifyEmail = async (toAddress: string, token: string) => {
