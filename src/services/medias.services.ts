@@ -25,7 +25,7 @@ class MediaService {
         const mime = await import("mime")
 
         const uploadResult = await uploadFileToS3({
-          filename: newFullFileName,
+          filename: "images/" + newFullFileName,
           filepath: newPath,
           contentType: mime.default.getType(newPath) || "image/jpeg",
         })
@@ -43,12 +43,22 @@ class MediaService {
 
   async handleUploadVideos(req: Request) {
     const files = await handleUploadVideo(req)
-    const result = files.map((file) => {
-      return {
-        url: `${envConfig.HOST}/statics/videos/${file.newFilename}`,
-        type: MediaType.VIDEO,
-      }
-    })
+    const result = await Promise.all(
+      files.map(async (file) => {
+        const mime = await import("mime")
+        const uploadResult = await uploadFileToS3({
+          filename: "videos/" + file.newFilename,
+          filepath: file.filepath,
+          contentType: mime.default.getType(file.filepath) || "video/mp4",
+        })
+
+        await fsPromises.unlink(file.filepath)
+        return {
+          url: uploadResult.Location,
+          type: MediaType.VIDEO,
+        }
+      }),
+    )
     return result
   }
 }
