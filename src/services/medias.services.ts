@@ -6,6 +6,8 @@ import { Request } from "express"
 import { UPLOAD_IMAGE_DIR } from "~/constants/dir"
 import { envConfig } from "~/constants/config"
 import { MediaType } from "~/types/enums"
+import { uploadFileToS3 } from "~/utils/s3"
+import fsPromises from "fs/promises"
 
 class MediaService {
   async handleUploadImages(req: Request) {
@@ -15,14 +17,23 @@ class MediaService {
     const result = await Promise.all(
       files.map(async (file) => {
         const newFileName = getNameWithoutExtension(file.newFilename)
-        const newPath = path.resolve(UPLOAD_IMAGE_DIR, `${newFileName}.jpeg`)
+        const newFullFileName = `${newFileName}.jpeg`
+        const newPath = path.resolve(UPLOAD_IMAGE_DIR, newFullFileName)
         sharp.cache(false)
         await sharp(file.filepath).jpeg().toFile(newPath)
 
+        const mime = await import("mime")
+
+        const uploadResult = await uploadFileToS3({
+          filename: newFullFileName,
+          filepath: newPath,
+          contentType: mime.default.getType(newPath) || "image/jpeg",
+        })
+
         // Delete the original file
-        fs.unlinkSync(file.filepath)
+        await Promise.all([fsPromises.unlink(file.filepath), fsPromises.unlink(newPath)])
         return {
-          url: `${envConfig.HOST}/statics/images/${newFileName}.jpeg`,
+          url: uploadResult.Location,
           type: MediaType.IMAGE,
         }
       }),
