@@ -39,12 +39,6 @@ if (!envValidationResult.success) {
 
 export const envConfig = envValidationResult.data
 
-export const isEnvProduction = () => {
+export const isProduction = () => {
   return envConfig.NODE_ENV === "production"
 }
-
-// const commandArgs = argv(process.argv.slice(2))
-
-// export const isEnvProduction = () => {
-//   return Boolean(commandArgs.production)
-// }

@@ -1,9 +1,7 @@
 import { SendEmailCommand, SESClient } from "@aws-sdk/client-ses"
 import { envConfig } from "~/constants/config"
-import dotenv from "dotenv"
 import fs from "fs"
 import path from "path"
-dotenv.config()
 
 const verify_email_template = fs.readFileSync(path.resolve("src/templates/verify-email.html"), "utf-8")
 

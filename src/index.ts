@@ -1,4 +1,5 @@
 import express from "express"
+import helmet from "helmet"
 import cors from "cors"
 import { defaultErrorHandler } from "~/middlewares/error.middlewares"
 import { envConfig } from "~/constants/config"
@@ -21,6 +22,7 @@ const port = envConfig.PORT
 
 initLogging()
 initUploadsFolder()
+
 databaseService.connect().then(() => {
   databaseService.indexUser()
   databaseService.indexRefreshToken()
@@ -28,7 +30,13 @@ databaseService.connect().then(() => {
   databaseService.indexTweet()
 })
 app.use(express.json())
-app.use(cors())
+app.use(helmet())
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  }),
+)
 app.use(logRequest)
 
 // Routes

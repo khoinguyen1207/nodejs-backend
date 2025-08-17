@@ -7,6 +7,7 @@ import Tweet from "~/models/schemas/Tweet.schema"
 import Hashtag from "~/models/schemas/Hashtag.schema"
 import Bookmark from "~/models/schemas/Bookmark.schema"
 import Like from "~/models/schemas/Like.schema"
+import { logger } from "~/constants/logging"
 
 const uri = `mongodb+srv://${envConfig.DB_USERNAME}:${envConfig.DB_PASSWORD}@twitter.rguyisz.mongodb.net/?retryWrites=true&w=majority&appName=Twitter`
 
@@ -25,9 +26,9 @@ class DatabaseService {
       await this.client.connect()
       // Send a ping to confirm a successful connection
       await this.db.command({ ping: 1 })
-      console.log("Pinged your deployment. You successfully connected to MongoDB!")
+      logger.info("✅ Pinged your deployment. You successfully connected to MongoDB!")
     } catch (error) {
-      console.log(error)
+      logger.error("❌ Failed to connect to MongoDB:", error)
       await this.client.close()
     }
   }
