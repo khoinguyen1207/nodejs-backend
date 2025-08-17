@@ -30,6 +30,7 @@ databaseService.connect().then(() => {
   databaseService.indexFollower()
   databaseService.indexTweet()
 })
+
 app.use(express.json())
 app.use(logRequest)
 app.use(helmet())
@@ -48,6 +49,7 @@ app.use(
     ipv6Subnet: 56, // Set to 60 or 64 to be less aggressive, or 52 or 48 to be more aggressive
   }),
 )
+
 // Routes
 app.use("/users", usersRouter)
 app.use("/auths", authsRouter)

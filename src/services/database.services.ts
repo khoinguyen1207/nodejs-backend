@@ -26,7 +26,7 @@ class DatabaseService {
       await this.client.connect()
       // Send a ping to confirm a successful connection
       await this.db.command({ ping: 1 })
-      logger.info("✅ Pinged your deployment. You successfully connected to MongoDB!")
+      logger.info("✅ You successfully connected to MongoDB!")
     } catch (error) {
       logger.error("❌ Failed to connect to MongoDB:", error)
       await this.client.close()
