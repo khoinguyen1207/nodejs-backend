@@ -50,6 +50,16 @@ app.use(
   }),
 )
 
+// Health check endpoint for Docker
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: envConfig.NODE_ENV,
+  })
+})
+
 // Routes
 app.use("/users", usersRouter)
 app.use("/auths", authsRouter)

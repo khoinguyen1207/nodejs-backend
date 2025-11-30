@@ -9,7 +9,21 @@ import Bookmark from "~/models/schemas/Bookmark.schema"
 import Like from "~/models/schemas/Like.schema"
 import { logger } from "~/constants/logging"
 
-const uri = `mongodb+srv://${envConfig.DB_USERNAME}:${envConfig.DB_PASSWORD}@twitter.rguyisz.mongodb.net/?retryWrites=true&w=majority&appName=Twitter`
+// Build MongoDB connection URI
+// Supports both local MongoDB (Docker) and MongoDB Atlas
+const getMongoUri = () => {
+  // If DB_HOST is provided, use local/Docker MongoDB
+  if (envConfig.DB_HOST) {
+    const host = envConfig.DB_HOST
+    const port = envConfig.DB_PORT || "27017"
+    return `mongodb://${envConfig.DB_USERNAME}:${envConfig.DB_PASSWORD}@${host}:${port}/?authSource=admin`
+  }
+
+  // Otherwise, use MongoDB Atlas (original connection string)
+  return `mongodb+srv://${envConfig.DB_USERNAME}:${envConfig.DB_PASSWORD}@twitter.rguyisz.mongodb.net/?retryWrites=true&w=majority&appName=Twitter`
+}
+
+const uri = getMongoUri()
 
 class DatabaseService {
   private client: MongoClient

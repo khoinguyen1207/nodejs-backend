@@ -6,6 +6,8 @@ const envSchema = z.object({
   DB_USERNAME: z.string().min(1),
   DB_PASSWORD: z.string().min(1),
   DB_NAME: z.string().min(1),
+  DB_HOST: z.string().optional(), // For Docker/local MongoDB (e.g., "mongodb" or "localhost")
+  DB_PORT: z.string().optional().default("27017"), // MongoDB port
   PORT: z.string().default("4000"),
   HOST: z.string().min(1),
   CLIENT_URL: z.string().min(1).default("http://localhost:3000"),
@@ -38,6 +40,8 @@ if (!envValidationResult.success) {
 }
 
 export const envConfig = envValidationResult.data
+
+console.log("Server is running with environment:", envConfig.NODE_ENV)
 
 export const isProduction = () => {
   return envConfig.NODE_ENV === "production"
