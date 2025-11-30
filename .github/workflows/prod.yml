@@ -1,0 +1,22 @@
+name: Docker Image CI for Production
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Copy env file
+        run: echo "${{ secrets.PRODUCTION_ENV }}" > .env
+
+      - name: Build Docker image
+        run: docker build -t my-nodejs:latest .

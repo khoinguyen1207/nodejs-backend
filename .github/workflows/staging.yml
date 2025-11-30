@@ -1,0 +1,22 @@
+name: Docker Image CI for Staging
+on:
+  push:
+    branches:
+      - staging
+  pull_request:
+    branches:
+      - staging
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Copy env file
+        run: echo "${{ secrets.STAGING_ENV }}" > .env
+
+      - name: Build Docker image
+        run: docker build -t my-nodejs:latest .
